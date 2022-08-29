@@ -198,6 +198,20 @@ class World {
           this._swapTilesIf(x, y, x - bias, y, ["AIR"]) ||
           this._swapTilesIf(x, y, x + bias, y, ["AIR"])
         );
+
+      case "QUEEN":
+        // when touching fungus, converts one fungus to egg, else move any direction towards closest fungus
+        return (
+          this._convertTileIf(x - 1, y - 1, "EGG", ["FUNGUS"]) ||
+          this._convertTileIf(x + 1, y - 1, "EGG", ["FUNGUS"]) ||
+          this._convertTileIf(x, y - 1, "EGG", ["FUNGUS"]) ||
+          this._convertTileIf(x - 1, y, "EGG", ["FUNGUS"]) ||
+          this._convertTileIf(x + 1, y, "EGG", ["FUNGUS"]) ||
+          this._convertTileIf(x - 1, y + 1, "EGG", ["FUNGUS"]) ||
+          this._convertTileIf(x + 1, y + 1, "EGG", ["FUNGUS"]) ||
+          this._convertTileIf(x, y + 1, "EGG", ["FUNGUS"]) ||
+          this._searchForTile(x, y, "FUNGUS", 10, ["AIR", "EGG"])
+        );
     }
   }
 
@@ -232,6 +246,47 @@ class World {
       this._swapTiles(x, y, a, b);
       return true;
     }
+  }
+
+  _convertTileIf(x, y, tile, mask) {
+    if (!this._is(x, y, mask)) {
+      return false;
+    } else {
+      this.setTile(x, y, tile);
+      return true;
+    }
+  }
+
+  _searchForTile(x, y, tile, radius, walkableMask = ["AIR"]) {
+    console.log("searching for ", tile);
+    for (let r = 1; r <= radius; r++) {
+      for (let dx = -r; dx <= r; dx++) {
+        for (let dy = -r; dy <= r; dy++) {
+          if (dx === 0 && dy === 0) continue;
+
+          const a = x + dx;
+          const b = y + dy;
+
+          if (this._is(a, b, tile)) {
+            // found
+            console.log(dx, dy, Math.sign(dx));
+            const desiredX = x + Math.sign(dx);
+            const desiredY = y + Math.sign(dy);
+
+            // move towards if possible
+            if (
+              this._swapTilesIf(x, y, desiredX, desiredY, walkableMask) ||
+              this._swapTilesIf(x, y, x, desiredY, walkableMask) ||
+              this._swapTilesIf(x, y, desiredX, y, walkableMask)
+            ) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+    // none reachable found in radius
+    return false;
   }
 
   _generatePatches(count, maxHeight, minSize, maxSize, tile, mask) {
