@@ -1,6 +1,20 @@
 const QUEEN_SPEED = 0.1; // The queen will only act this proportion of ticks
 const KILL_CHANCE = 0.01; // Chance per tick for each neighbouring hazard to kill
 
+// Tiles ants can climb
+const ANT_CLIMB_MASK = [
+  "SOIL",
+  "SAND",
+  "STONE",
+  "PLANT",
+  "FUNGUS",
+  "CORPSE",
+  "ANT",
+  "EGG",
+];
+
+// Tiles ants can move through
+const ANT_WALK_MASK = ["AIR", "EGG", "PLANT", "FUNGUS"];
 class World {
   constructor(rows, cols, generatorSettings = {}) {
     this.rows = rows;
@@ -190,16 +204,6 @@ class World {
   }
 
   _doTileAction(x, y) {
-    const climbMask = [
-      "SOIL",
-      "SAND",
-      "STONE",
-      "PLANT",
-      "FUNGUS",
-      "CORPSE",
-      "ANT",
-      "EGG",
-    ];
     const bias = Math.random > 0.5 ? 1 : -1;
     switch (this.getTile(x, y)) {
       case "SAND":
@@ -282,7 +286,7 @@ class World {
           this._convertTileIf(x - 1, y + 1, "EGG", ["FUNGUS"]) ||
           this._convertTileIf(x + 1, y + 1, "EGG", ["FUNGUS"]) ||
           this._convertTileIf(x, y + 1, "EGG", ["FUNGUS"]) ||
-          this._searchForTile(x, y, "FUNGUS", 10, ["AIR", "EGG", "ANT"])
+          this._searchForTile(x, y, "FUNGUS", 10, ANT_WALK_MASK)
         );
 
       case "ANT":
@@ -295,13 +299,8 @@ class World {
         const dx = randomIntInclusive(-1, 1);
         const dy = randomIntInclusive(-1, 1);
         return (
-          (dy < 1 || this._touching(x + dx, y + dy, climbMask) > 2) &&
-          this._swapTilesIf(x, y, x + dx, y + dy, [
-            "AIR",
-            "EGG",
-            "PLANT",
-            "FUNGUS",
-          ])
+          (dy < 1 || this._touching(x + dx, y + dy, ANT_CLIMB_MASK) > 2) &&
+          this._swapTilesIf(x, y, x + dx, y + dy, ANT_WALK_MASK)
         );
 
       case "EGG":
