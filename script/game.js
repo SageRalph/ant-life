@@ -56,27 +56,27 @@ function setupControls() {
     }
   });
 
-  $("#map").on("mousedown", function (e) {
+  $("#map").on("pointerdown", function (e) {
+    _setPointerLocation(e);
     BRUSH_ON = true;
+    doInput();
   });
-  $("#map").on("mouseup", function (e) {
+  $("#map").on("pointermove", function (e) {
+    _setPointerLocation(e);
+    if (BRUSH_ON) doInput();
+  });
+  $("#map").on("pointerup pointercancel pointerout", function (e) {
     BRUSH_ON = false;
   });
-  $("#map").on("mousemove", function (e) {
-    const rect = e.target.getBoundingClientRect();
-    const cx = e.clientX - rect.left;
-    const cy = e.clientY - rect.top;
-    const { x, y } = RENDERER.mapCoordinates(cx, cy);
-    BRUSH_X = x;
-    BRUSH_Y = y;
+}
 
-    // Make fast movement while brushing less patchy
-    if (!BRUSH_ON) return;
-    const brushSize = Math.round($("#brush-size").val());
-    const brushMat = $("#brush-mat").val();
-    WORLD.fillCircle(BRUSH_X, BRUSH_Y, brushSize, brushMat);
-    RENDERER.draw();
-  });
+function _setPointerLocation(e) {
+  const rect = e.target.getBoundingClientRect();
+  const cx = e.clientX - rect.left;
+  const cy = e.clientY - rect.top;
+  const { x, y } = RENDERER.mapCoordinates(cx, cy);
+  BRUSH_X = x;
+  BRUSH_Y = y;
 }
 
 function init() {
