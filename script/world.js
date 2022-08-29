@@ -190,6 +190,16 @@ class World {
   }
 
   _doTileAction(x, y) {
+    const climbMask = [
+      "SOIL",
+      "SAND",
+      "STONE",
+      "PLANT",
+      "FUNGUS",
+      "CORPSE",
+      "ANT",
+      "EGG",
+    ];
     const bias = Math.random > 0.5 ? 1 : -1;
     switch (this.getTile(x, y)) {
       case "SAND":
@@ -280,7 +290,14 @@ class World {
         if (Math.random() <= KILL_CHANCE * this._touching(x, y, ["WATER"])) {
           return this.setTile(x, y, "CORPSE");
         }
-        return;
+
+        // TODO - ants currently just move randomly
+        const dx = randomIntInclusive(-1, 1);
+        const dy = randomIntInclusive(-1, 1);
+        return (
+          (dy < 1 || this._touching(x + dx, y + dy, climbMask) > 2) &&
+          this._swapTilesIf(x, y, x + dx, y + dy, ["AIR", "EGG", "SAND"])
+        );
 
       case "EGG":
         // Destroyed by water
