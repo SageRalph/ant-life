@@ -172,10 +172,6 @@ class World {
       this.fillCircle(x, 0, randomIntInclusive(1, 6), "STONE");
     }
 
-    for (let i = 0; i < startingAge; i++) {
-      this.tick();
-    }
-
     // Starting area
     // Clear a cone shape
     const queenToCeil = this.rows - surfaceY + 1;
@@ -191,6 +187,11 @@ class World {
       fungusMaxSize,
       "FUNGUS",
     );
+
+    for (let i = 0; i < startingAge; i++) {
+      this.tick();
+    }
+
     // Starting units
     this.setTile(midX, surfaceY, "QUEEN");
   }
@@ -229,6 +230,28 @@ class World {
         if (Math.random() <= KILL_CHANCE * this._touching(x, y, ["FUNGUS"])) {
           return this.setTile(x, y, "FUNGUS");
         }
+
+        // when touching air and water, convert one to plant
+        if (
+          Math.random() <=
+          KILL_CHANCE *
+            this._touching(x, y, ["AIR"]) * // base chance from empty space
+            (this._touching(x, y, ["WATER"]) + 0.1) * // penalty if no water
+            (this._touching(x, y, ["CORPSE"]) + 1) // bonus if corpses
+        ) {
+          const growMask = ["AIR", "WATER", "CORPSE"];
+          return (
+            this._convertTileIf(x - 1, y - 1, "PLANT", growMask) ||
+            this._convertTileIf(x + 1, y - 1, "PLANT", growMask) ||
+            this._convertTileIf(x, y - 1, "PLANT", growMask) ||
+            this._convertTileIf(x - 1, y, "PLANT", growMask) ||
+            this._convertTileIf(x + 1, y, "PLANT", growMask) ||
+            this._convertTileIf(x - 1, y + 1, "PLANT", growMask) ||
+            this._convertTileIf(x + 1, y + 1, "PLANT", growMask) ||
+            this._convertTileIf(x, y + 1, "PLANT", ["AIR", "WATER", "CORPSE"])
+          );
+        }
+
         return;
 
       case "QUEEN":
