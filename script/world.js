@@ -64,6 +64,10 @@ class World {
     waterMax = 10,
     waterMinSize = 4,
     waterMaxSize = 10,
+    hollowMin = 5,
+    hollowMax = 10,
+    hollowMinSize = 4,
+    hollowMaxSize = 10,
     fungusMin = 15,
     fungusMax = 15,
     fungusMinSize = 1,
@@ -90,62 +94,62 @@ class World {
     }
 
     // Sand
-    this.sandCount = randomIntInclusive(sandMin, sandMax);
-    for (let i = 0; i < this.sandCount; i++) {
-      this.fillCircle(
-        randomIntInclusive(0, this.cols),
-        randomIntInclusive(0, surfaceY),
-        randomIntInclusive(sandMinSize, sandMaxSize),
-        "SAND",
-      );
-    }
+    this._generatePatches(
+      randomIntInclusive(sandMin, sandMax),
+      surfaceY,
+      sandMinSize,
+      sandMaxSize,
+      "SAND",
+    );
 
     // Stones
-    this.stoneCount = randomIntInclusive(stoneMin, stoneMax);
-    for (let i = 0; i < this.stoneCount; i++) {
-      this.fillCircle(
-        randomIntInclusive(0, this.cols),
-        randomIntInclusive(0, surfaceY),
-        randomIntInclusive(stoneMinSize, stoneMaxSize),
-        "STONE",
-      );
-    }
+    this._generatePatches(
+      randomIntInclusive(stoneMin, stoneMax),
+      surfaceY,
+      stoneMinSize,
+      stoneMaxSize,
+      "STONE",
+    );
 
     // Water
-    this.waterCount = randomIntInclusive(waterMin, waterMax);
-    for (let i = 0; i < this.waterCount; i++) {
-      this.fillCircle(
-        randomIntInclusive(0, this.cols),
-        randomIntInclusive(0, surfaceY - waterMaxSize * 2),
-        randomIntInclusive(waterMinSize, waterMaxSize),
-        "WATER",
-        ["SOIL", "SAND", "STONE"],
-      );
-    }
+    this._generatePatches(
+      randomIntInclusive(waterMin, waterMax),
+      surfaceY - waterMaxSize * 2,
+      waterMinSize,
+      waterMaxSize,
+      "WATER",
+      ["SOIL", "SAND", "STONE"],
+    );
+
+    // Air pockets
+    this._generatePatches(
+      randomIntInclusive(hollowMin, hollowMax),
+      surfaceY,
+      hollowMinSize,
+      hollowMaxSize,
+      "AIR",
+      ["SOIL", "SAND", "STONE", "WATER"],
+    );
 
     // Fungus
-    this.fungusCount = randomIntInclusive(fungusMin, fungusMax);
-    for (let i = 0; i < this.fungusCount; i++) {
-      this.fillCircle(
-        randomIntInclusive(0, this.cols),
-        randomIntInclusive(0, surfaceY - fungusMaxSize * 2),
-        randomIntInclusive(fungusMinSize, fungusMaxSize),
-        "FUNGUS",
-        ["SOIL", "SAND"],
-      );
-    }
+    this._generatePatches(
+      randomIntInclusive(fungusMin, fungusMax),
+      surfaceY - fungusMaxSize * 2,
+      fungusMinSize,
+      fungusMaxSize,
+      "FUNGUS",
+      ["SOIL", "SAND"],
+    );
 
     // Noise (to make shapes less obvious)
-    this.noiseCount = randomIntInclusive(noiseMin, noiseMax);
-    for (let i = 0; i < this.noiseCount; i++) {
-      this.fillCircle(
-        randomIntInclusive(0, this.cols),
-        randomIntInclusive(0, surfaceY),
-        randomIntInclusive(noiseMinSize, noiseMaxSize),
-        "SOIL",
-        ["SAND", "STONE", "WATER", "FUNGUS"],
-      );
-    }
+    this._generatePatches(
+      randomIntInclusive(noiseMin, noiseMax),
+      surfaceY,
+      noiseMinSize,
+      noiseMaxSize,
+      "SOIL",
+      ["SAND", "STONE", "WATER", "FUNGUS", "AIR"],
+    );
 
     for (let i = 0; i < startingAge; i++) {
       this.tick();
@@ -221,5 +225,17 @@ class World {
     const t2 = this.getTile(a, b);
     this.setTile(a, b, t1);
     this.setTile(x, y, t2);
+  }
+
+  _generatePatches(count, maxHeight, minSize, maxSize, tile, mask) {
+    for (let i = 0; i < count; i++) {
+      this.fillCircle(
+        randomIntInclusive(0, this.cols),
+        randomIntInclusive(0, maxHeight),
+        randomIntInclusive(minSize, maxSize),
+        tile,
+        mask,
+      );
+    }
   }
 }
