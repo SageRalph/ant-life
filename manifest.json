@@ -1,0 +1,15 @@
+{
+  "name": "Ant Life",
+  "short_name": "Ant Life",
+  "description": "A game of ants",
+  "start_url": "index.html",
+  "display": "fullscreen",
+  "background_color": "#FFFFFF",
+  "theme_color": "#8b7396",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "218x218"
+    }
+  ]
+}
