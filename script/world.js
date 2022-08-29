@@ -76,7 +76,7 @@ class World {
     noiseMax = 200,
     noiseMinSize = 4,
     noiseMaxSize = 6,
-    startingAge = 100,
+    startingAge = 0,
   }) {
     const surfaceY = Math.round(this.rows * (1 - skyProp));
     const midX = Math.round(this.cols / 2);
@@ -180,31 +180,26 @@ class World {
   }
 
   _doTileAction(x, y) {
+    const bias = Math.random > 0.5 ? 1 : -1;
     switch (this.getTile(x, y)) {
       case "SAND":
         // move down or diagonally down
-        if (this._is(x, y - 1, ["AIR", "WATER"])) {
-          this._swapTiles(x, y, x, y - 1);
-        } else if (this._is(x - 1, y - 1, ["AIR", "WATER"])) {
-          this._swapTiles(x, y, x - 1, y - 1);
-        } else if (this._is(x + 1, y - 1, ["AIR", "WATER"])) {
-          this._swapTiles(x, y, x + 1, y - 1);
-        }
-        break;
+
+        return (
+          this._swapTilesIf(x, y, x, y - 1, ["AIR", "WATER"]) ||
+          this._swapTilesIf(x, y, x - bias, y - 1, ["AIR", "WATER"]) ||
+          this._swapTilesIf(x, y, x + bias, y - 1, ["AIR", "WATER"])
+        );
+
       case "WATER":
         // move down or diagonally down or sideways
-        if (this._is(x, y - 1, "AIR")) {
-          this._swapTiles(x, y, x, y - 1);
-        } else if (this._is(x - 1, y - 1, "AIR")) {
-          this._swapTiles(x, y, x - 1, y - 1);
-        } else if (this._is(x + 1, y - 1, "AIR")) {
-          this._swapTiles(x, y, x + 1, y - 1);
-        } else if (this._is(x - 1, y, "AIR")) {
-          this._swapTiles(x, y, x - 1, y);
-        } else if (this._is(x + 1, y, "AIR")) {
-          this._swapTiles(x, y, x + 1, y);
-        }
-        break;
+        return (
+          this._swapTilesIf(x, y, x, y - 1, ["AIR"]) ||
+          this._swapTilesIf(x, y, x - bias, y - 1, ["AIR"]) ||
+          this._swapTilesIf(x, y, x + bias, y - 1, ["AIR"]) ||
+          this._swapTilesIf(x, y, x - bias, y, ["AIR"]) ||
+          this._swapTilesIf(x, y, x + bias, y, ["AIR"])
+        );
     }
   }
 
@@ -230,6 +225,15 @@ class World {
     const t2 = this.getTile(a, b);
     this.setTile(a, b, t1);
     this.setTile(x, y, t2);
+  }
+
+  _swapTilesIf(x, y, a, b, mask) {
+    if (!this._is(a, b, mask)) {
+      return false;
+    } else {
+      this._swapTiles(x, y, a, b);
+      return true;
+    }
   }
 
   _generatePatches(count, maxHeight, minSize, maxSize, tile, mask) {

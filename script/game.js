@@ -11,7 +11,7 @@ const TILESET = {
   CORPSE: "black",
   PLANT: "olivedrab",
   WATER: "blue",
-  FUNGUS: "cyan",
+  FUNGUS: "darkcyan",
 };
 
 const FPS = 10;
