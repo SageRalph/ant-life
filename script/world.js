@@ -53,36 +53,29 @@ class World {
 
   _generate({
     skyProp = 0.2,
+    startingAge = 100,
     startAreaSize = 15,
-    sandMin = 30,
-    sandMax = 60,
+    sandCount = 50,
     sandMinSize = 4,
     sandMaxSize = 10,
-    stoneMin = 10,
-    stoneMax = 20,
+    stoneCount = 15,
     stoneMinSize = 4,
     stoneMaxSize = 8,
-    waterMin = 5,
-    waterMax = 10,
+    waterCount = 8,
     waterMinSize = 5,
     waterMaxSize = 15,
-    hollowMin = 5,
-    hollowMax = 10,
+    hollowCount = 15,
     hollowMinSize = 4,
     hollowMaxSize = 10,
-    plantMin = 10,
-    plantMax = 20,
+    plantCount = 20,
     plantMinSize = 4,
     plantMaxSize = 6,
-    fungusMin = 20,
-    fungusMax = 20,
+    fungusCount = 30,
     fungusMinSize = 1,
     fungusMaxSize = 4,
-    noiseMin = 200,
-    noiseMax = 200,
+    noiseCount = 200,
     noiseMinSize = 4,
     noiseMaxSize = 6,
-    startingAge = 100,
   }) {
     const surfaceY = Math.round(this.rows * (1 - skyProp));
     const midX = Math.round(this.cols / 2);
@@ -101,7 +94,7 @@ class World {
 
     // Sand
     this._generatePatches(
-      randomIntInclusive(sandMin, sandMax),
+      sandCount,
       surfaceY,
       sandMinSize,
       sandMaxSize,
@@ -110,7 +103,7 @@ class World {
 
     // Stones
     this._generatePatches(
-      randomIntInclusive(stoneMin, stoneMax),
+      stoneCount,
       surfaceY,
       stoneMinSize,
       stoneMaxSize,
@@ -119,7 +112,7 @@ class World {
 
     // Water
     this._generatePatches(
-      randomIntInclusive(waterMin, waterMax),
+      waterCount,
       surfaceY - waterMaxSize * 2,
       waterMinSize,
       waterMaxSize,
@@ -129,7 +122,7 @@ class World {
 
     // Air pockets
     this._generatePatches(
-      randomIntInclusive(hollowMin, hollowMax),
+      hollowCount,
       surfaceY,
       hollowMinSize,
       hollowMaxSize,
@@ -139,7 +132,7 @@ class World {
 
     // Plant
     this._generatePatches(
-      randomIntInclusive(plantMin, plantMax),
+      plantCount,
       surfaceY,
       plantMinSize,
       plantMaxSize,
@@ -149,7 +142,7 @@ class World {
 
     // Fungus
     this._generatePatches(
-      randomIntInclusive(fungusMin, fungusMax),
+      fungusCount,
       surfaceY - fungusMaxSize * 2,
       fungusMinSize,
       fungusMaxSize,
@@ -159,7 +152,7 @@ class World {
 
     // Noise (to make shapes less obvious)
     this._generatePatches(
-      randomIntInclusive(noiseMin, noiseMax),
+      noiseCount,
       surfaceY,
       noiseMinSize,
       noiseMaxSize,
@@ -180,11 +173,11 @@ class World {
       this.fillCircle(x, this.rows, queenToCeil, "AIR");
     }
     this.fillCircle(midX, surfaceY, startAreaSize, "SOIL", ["SAND", "STONE"]);
-    // Guarantee an easy to reach max size fungus
+    // Guarantee an easy to reach fungus
     this.fillCircle(
       randomIntInclusive(midX - halfStartArea, midX + halfStartArea),
-      surfaceY - halfStartArea,
-      fungusMaxSize,
+      randomIntInclusive(surfaceY - startAreaSize, surfaceY),
+      4,
       "FUNGUS",
     );
 
