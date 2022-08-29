@@ -1,4 +1,5 @@
-const QUEEN_SPEED = 0.1;
+const QUEEN_SPEED = 0.1; // The queen will only act this proportion of ticks
+const KILL_CHANCE = 0.01; // Chance per tick for each neighbouring hazard to kill
 
 class World {
   constructor(rows, cols, generatorSettings = {}) {
@@ -191,17 +192,29 @@ class World {
           this._swapTilesIf(x, y, x + bias, y - 1, ["AIR", "WATER"])
         );
 
-      case "WATER":
-        // move down or diagonally down or sideways
+      case "CORPSE":
+        // move down or diagonally down
         return (
           this._swapTilesIf(x, y, x, y - 1, ["AIR"]) ||
           this._swapTilesIf(x, y, x - bias, y - 1, ["AIR"]) ||
-          this._swapTilesIf(x, y, x + bias, y - 1, ["AIR"]) ||
-          this._swapTilesIf(x, y, x - bias, y, ["AIR"]) ||
-          this._swapTilesIf(x, y, x + bias, y, ["AIR"])
+          this._swapTilesIf(x, y, x + bias, y - 1, ["AIR"])
+        );
+
+      case "WATER":
+        // move down or diagonally down or sideways
+        return (
+          this._swapTilesIf(x, y, x, y - 1, ["AIR", "CORPSE"]) ||
+          this._swapTilesIf(x, y, x - bias, y - 1, ["AIR", "CORPSE"]) ||
+          this._swapTilesIf(x, y, x + bias, y - 1, ["AIR", "CORPSE"]) ||
+          this._swapTilesIf(x, y, x - bias, y, ["AIR", "CORPSE"]) ||
+          this._swapTilesIf(x, y, x + bias, y, ["AIR", "CORPSE"])
         );
 
       case "QUEEN":
+        // Destroyed by water
+        if (Math.random() <= KILL_CHANCE * this._touching(x, y, ["WATER"])) {
+          return this.setTile(x, y, "CORPSE");
+        }
         // when touching fungus, converts one fungus to egg, else move any direction towards closest fungus
         return (
           Math.random() >= QUEEN_SPEED ||
@@ -216,7 +229,19 @@ class World {
           this._searchForTile(x, y, "FUNGUS", 10, ["AIR", "EGG"])
         );
 
+      case "ANT":
+        // Destroyed by water
+        if (Math.random() <= KILL_CHANCE * this._touching(x, y, ["WATER"])) {
+          return this.setTile(x, y, "CORPSE");
+        }
+        return;
+
       case "EGG":
+        // Destroyed by water
+        if (Math.random() <= KILL_CHANCE * this._touching(x, y, ["WATER"])) {
+          return this.setTile(x, y, "CORPSE");
+        }
+
         // chance to convert to ant, else move down or diagonally down
         if (Math.random() <= 0.001) {
           // hatch into QUEEN or ANT
@@ -228,8 +253,6 @@ class World {
           this._swapTilesIf(x, y, x - bias, y - 1, ["AIR", "WATER"]) ||
           this._swapTilesIf(x, y, x + bias, y - 1, ["AIR", "WATER"])
         );
-
-      case "ANT":
     }
   }
 
@@ -238,11 +261,24 @@ class World {
   }
 
   _doWithinBounds(minX, minY, maxX, maxY, func) {
-    for (let y = Math.max(minY, 0); y < Math.min(maxY, this.rows); y++) {
-      for (let x = Math.max(minX, 0); x < Math.min(maxX, this.rows); x++) {
+    for (let y = Math.max(minY, 0); y <= Math.min(maxY, this.rows - 1); y++) {
+      for (let x = Math.max(minX, 0); x <= Math.min(maxX, this.rows - 1); x++) {
         func(x, y);
       }
     }
+  }
+
+  _touching(x, y, mask) {
+    const me = this;
+    let count = 0;
+    this._doWithinBounds(x - 1, y - 1, x + 1, y + 1, function (a, b) {
+      if (me._is(a, b, mask)) {
+        console.log("hit");
+        count += 1;
+      }
+    });
+    console.log(count);
+    return count;
   }
 
   _is(x, y, mask) {
