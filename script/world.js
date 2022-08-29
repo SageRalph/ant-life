@@ -151,6 +151,11 @@ class World {
       ["SAND", "STONE", "WATER", "FUNGUS", "AIR"],
     );
 
+    // Bedrock
+    for (let x = 0; x < this.cols; x++) {
+      this.fillCircle(x, 0, randomIntInclusive(1, 6), "STONE");
+    }
+
     for (let i = 0; i < startingAge; i++) {
       this.tick();
     }
