@@ -111,7 +111,6 @@ function doInput(draw = true) {
     "AIR",
     "SOIL",
     "SAND",
-    "PLANT",
   ]);
   if (draw) RENDERER.draw();
 }
