@@ -251,7 +251,16 @@ class World {
             this._convertTileIf(x, y + 1, "PLANT", ["AIR", "WATER", "CORPSE"])
           );
         }
+        return;
 
+      case "FUNGUS":
+        // Destroyed by air
+        if (
+          Math.random() <=
+          KILL_CHANCE * (this._touching(x, y, ["AIR"]) - 2)
+        ) {
+          return this.setTile(x, y, "SAND");
+        }
         return;
 
       case "QUEEN":
