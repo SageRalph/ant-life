@@ -226,7 +226,7 @@ class World {
           this._convertTileIf(x - 1, y + 1, "EGG", ["FUNGUS"]) ||
           this._convertTileIf(x + 1, y + 1, "EGG", ["FUNGUS"]) ||
           this._convertTileIf(x, y + 1, "EGG", ["FUNGUS"]) ||
-          this._searchForTile(x, y, "FUNGUS", 10, ["AIR", "EGG"])
+          this._searchForTile(x, y, "FUNGUS", 10, ["AIR", "EGG", "ANT"])
         );
 
       case "ANT":
@@ -272,12 +272,8 @@ class World {
     const me = this;
     let count = 0;
     this._doWithinBounds(x - 1, y - 1, x + 1, y + 1, function (a, b) {
-      if (me._is(a, b, mask)) {
-        console.log("hit");
-        count += 1;
-      }
+      if (me._is(a, b, mask)) count++;
     });
-    console.log(count);
     return count;
   }
 
