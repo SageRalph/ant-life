@@ -64,14 +64,18 @@ class World {
     stoneMaxSize = 8,
     waterMin = 5,
     waterMax = 10,
-    waterMinSize = 4,
-    waterMaxSize = 10,
+    waterMinSize = 5,
+    waterMaxSize = 15,
     hollowMin = 5,
     hollowMax = 10,
     hollowMinSize = 4,
     hollowMaxSize = 10,
-    fungusMin = 15,
-    fungusMax = 15,
+    plantMin = 10,
+    plantMax = 20,
+    plantMinSize = 4,
+    plantMaxSize = 6,
+    fungusMin = 20,
+    fungusMax = 20,
     fungusMinSize = 1,
     fungusMaxSize = 4,
     noiseMin = 200,
@@ -133,6 +137,16 @@ class World {
       ["SOIL", "SAND", "STONE", "WATER"],
     );
 
+    // Plant
+    this._generatePatches(
+      randomIntInclusive(plantMin, plantMax),
+      surfaceY,
+      plantMinSize,
+      plantMaxSize,
+      "PLANT",
+      ["WATER", "AIR"],
+    );
+
     // Fungus
     this._generatePatches(
       randomIntInclusive(fungusMin, fungusMax),
@@ -150,7 +164,7 @@ class World {
       noiseMinSize,
       noiseMaxSize,
       "SOIL",
-      ["SAND", "STONE", "WATER", "FUNGUS", "AIR"],
+      ["SAND", "STONE", "WATER", "FUNGUS", "AIR", "PLANT"],
     );
 
     // Bedrock
@@ -210,12 +224,19 @@ class World {
           this._swapTilesIf(x, y, x + bias, y, ["AIR", "CORPSE"])
         );
 
+      case "PLANT":
+        // when touching fungus, convert to fungus
+        if (Math.random() <= KILL_CHANCE * this._touching(x, y, ["FUNGUS"])) {
+          return this.setTile(x, y, "FUNGUS");
+        }
+        return;
+
       case "QUEEN":
         // Destroyed by water
         if (Math.random() <= KILL_CHANCE * this._touching(x, y, ["WATER"])) {
           return this.setTile(x, y, "CORPSE");
         }
-        // when touching fungus, converts one fungus to egg, else move any direction towards closest fungus
+        // when touching fungus, converts one to egg, else move any direction towards closest fungus
         return (
           Math.random() >= QUEEN_SPEED ||
           this._convertTileIf(x - 1, y - 1, "EGG", ["FUNGUS"]) ||
