@@ -212,6 +212,21 @@ class World {
           this._convertTileIf(x, y + 1, "EGG", ["FUNGUS"]) ||
           this._searchForTile(x, y, "FUNGUS", 10, ["AIR", "EGG"])
         );
+
+      case "EGG":
+        // chance to convert to ant, else move down or diagonally down
+        if (Math.random() <= 0.001) {
+          // hatch into QUEEN or ANT
+          this.setTile(x, y, Math.random() < 0.01 ? "QUEEN" : "ANT");
+          return true;
+        }
+        return (
+          this._swapTilesIf(x, y, x, y - 1, ["AIR", "WATER"]) ||
+          this._swapTilesIf(x, y, x - bias, y - 1, ["AIR", "WATER"]) ||
+          this._swapTilesIf(x, y, x + bias, y - 1, ["AIR", "WATER"])
+        );
+
+      case "ANT":
     }
   }
 
@@ -258,7 +273,6 @@ class World {
   }
 
   _searchForTile(x, y, tile, radius, walkableMask = ["AIR"]) {
-    console.log("searching for ", tile);
     for (let r = 1; r <= radius; r++) {
       for (let dx = -r; dx <= r; dx++) {
         for (let dy = -r; dy <= r; dy++) {
@@ -269,7 +283,6 @@ class World {
 
           if (this._is(a, b, tile)) {
             // found
-            console.log(dx, dy, Math.sign(dx));
             const desiredX = x + Math.sign(dx);
             const desiredY = y + Math.sign(dy);
 
