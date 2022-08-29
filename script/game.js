@@ -13,15 +13,22 @@ const TILESET = {
   WATER: "blue",
   FUNGUS: "darkcyan",
 };
+const START_PAUSED = false;
 
 const FPS = 10;
 let FRAME_TIMER;
 let WORLD;
 let RENDERER;
+let BRUSH_ON = false;
+let BRUSH_X;
+let BRUSH_Y;
 
 $(document).ready(function () {
   init();
   setupControls();
+  if (!START_PAUSED) {
+    $("#btn-pause").trigger("click");
+  }
 });
 
 function setupControls() {
@@ -42,21 +49,32 @@ function setupControls() {
 
   $("#btn-reset").on("click", function () {
     init();
-    if (FRAME_TIMER) {
+    if (START_PAUSED && FRAME_TIMER) {
       clearTimeout(FRAME_TIMER);
       FRAME_TIMER = null;
       $("#btn-pause").text("Play");
     }
   });
 
-  $("#map").on("click", function (e) {
+  $("#map").on("mousedown", function (e) {
+    BRUSH_ON = true;
+  });
+  $("#map").on("mouseup", function (e) {
+    BRUSH_ON = false;
+  });
+  $("#map").on("mousemove", function (e) {
     const rect = e.target.getBoundingClientRect();
     const cx = e.clientX - rect.left;
     const cy = e.clientY - rect.top;
     const { x, y } = RENDERER.mapCoordinates(cx, cy);
+    BRUSH_X = x;
+    BRUSH_Y = y;
+
+    // Make fast movement while brushing less patchy
+    if (!BRUSH_ON) return;
     const brushSize = Math.round($("#brush-size").val());
     const brushMat = $("#brush-mat").val();
-    WORLD.fillCircle(x, y, brushSize, brushMat);
+    WORLD.fillCircle(BRUSH_X, BRUSH_Y, brushSize, brushMat);
     RENDERER.draw();
   });
 }
@@ -72,6 +90,7 @@ function init() {
 function gameLoop(loop = true) {
   const start = Date.now();
 
+  doInput();
   WORLD.tick();
   RENDERER.draw();
 
@@ -81,4 +100,11 @@ function gameLoop(loop = true) {
   if (loop) {
     FRAME_TIMER = setTimeout(gameLoop, delayMS);
   }
+}
+
+function doInput() {
+  if (!BRUSH_ON) return;
+  const brushSize = Math.round($("#brush-size").val());
+  const brushMat = $("#brush-mat").val();
+  WORLD.fillCircle(BRUSH_X, BRUSH_Y, brushSize, brushMat);
 }

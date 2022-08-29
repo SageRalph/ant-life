@@ -76,7 +76,7 @@ class World {
     noiseMax = 200,
     noiseMinSize = 4,
     noiseMaxSize = 6,
-    startingAge = 0,
+    startingAge = 100,
   }) {
     const surfaceY = Math.round(this.rows * (1 - skyProp));
     const midX = Math.round(this.cols / 2);
