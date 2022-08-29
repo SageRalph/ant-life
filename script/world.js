@@ -52,7 +52,7 @@ class World {
   }
 
   _generate({
-    skyProp = 0.1,
+    skyProp = 0.2,
     startAreaSize = 15,
     sandMin = 30,
     sandMax = 60,
