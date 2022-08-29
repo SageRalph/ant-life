@@ -1,7 +1,7 @@
 {
   "name": "Ant Life",
   "short_name": "Ant Life",
-  "description": "A game of ants",
+  "description": "A game with bugs",
   "start_url": "index.html",
   "display": "fullscreen",
   "background_color": "#FFFFFF",
