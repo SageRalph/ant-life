@@ -24,4 +24,11 @@ class Renderer {
       }
     }
   }
+
+  mapCoordinates(x, y) {
+    return {
+      x: Math.floor(x / this._cw),
+      y: this.world.rows - Math.floor(y / this._ch),
+    };
+  }
 }

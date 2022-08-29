@@ -35,9 +35,11 @@ function setupControls() {
       gameLoop();
     }
   });
+
   $("#btn-tick").on("click", function () {
     gameLoop(false);
   });
+
   $("#btn-reset").on("click", function () {
     init();
     if (FRAME_TIMER) {
@@ -45,6 +47,17 @@ function setupControls() {
       FRAME_TIMER = null;
       $("#btn-pause").text("Play");
     }
+  });
+
+  $("#map").on("click", function (e) {
+    const rect = e.target.getBoundingClientRect();
+    const cx = e.clientX - rect.left;
+    const cy = e.clientY - rect.top;
+    const { x, y } = RENDERER.mapCoordinates(cx, cy);
+    const brushSize = Math.round($("#brush-size").val());
+    const brushMat = $("#brush-mat").val();
+    WORLD.fillCircle(x, y, brushSize, brushMat);
+    RENDERER.draw();
   });
 }
 
@@ -63,7 +76,7 @@ function gameLoop(loop = true) {
   RENDERER.draw();
 
   const elapsed = Date.now() - start;
-  console.log("Frame time ms:", elapsed);
+  console.log("Tick Duration ms:", elapsed);
   const delayMS = Math.max(Math.round(start + 1000 / FPS) - Date.now(), 0);
   if (loop) {
     FRAME_TIMER = setTimeout(gameLoop, delayMS);

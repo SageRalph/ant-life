@@ -184,7 +184,6 @@ class World {
     switch (this.getTile(x, y)) {
       case "SAND":
         // move down or diagonally down
-
         return (
           this._swapTilesIf(x, y, x, y - 1, ["AIR", "WATER"]) ||
           this._swapTilesIf(x, y, x - bias, y - 1, ["AIR", "WATER"]) ||

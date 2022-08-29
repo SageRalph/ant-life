@@ -39,3 +39,19 @@ button {
   width: 8rem;
   font-size: 1rem;
 }
+
+label {
+  display: block;
+  margin: 1rem;
+}
+
+label > * {
+  display: inline-block;
+  width: 10rem;
+}
+
+label input,
+label select {
+  padding: 0.5rem;
+  margin-left: 1rem;
+}
