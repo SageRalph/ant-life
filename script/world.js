@@ -9,7 +9,6 @@ class World {
 
   tick() {
     this.age += 1;
-    console.log("World tick:", this.age);
 
     for (let y = 0; y < this.rows; y++) {
       for (let x = 0; x < this.cols; x++) {

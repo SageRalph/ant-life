@@ -6,6 +6,7 @@ class Renderer {
     this._ctx = canvas.getContext("2d");
     this._cw = canvas.width / world.cols;
     this._ch = canvas.height / world.rows;
+    console.log(canvas);
   }
 
   draw() {
@@ -26,9 +27,14 @@ class Renderer {
   }
 
   mapCoordinates(x, y) {
+    const rect = this.canvas.getBoundingClientRect();
+    const scaleX = this.canvas.width / rect.width;
+    const scaleY = this.canvas.height / rect.height;
+    const cx = (x - rect.left) * scaleX;
+    const cy = (y - rect.top) * scaleY;
     return {
-      x: Math.floor(x / this._cw),
-      y: this.world.rows - Math.floor(y / this._ch),
+      x: Math.floor(cx / this._cw),
+      y: this.world.rows - Math.floor(cy / this._ch),
     };
   }
 }

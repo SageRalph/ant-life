@@ -30,32 +30,45 @@
     <main id="content">
       <h1 id="banner">Ant Life</h1>
       <p>A game with bugs</p>
-      <canvas id="map" width="600px" height="600px"></canvas>
-      <button id="btn-pause">Play</button>
-      <button id="btn-tick">Step</button>
-      <button id="btn-reset">Reset</button>
-      <label>
-        <span>Brush</span>
-        <select id="brush-mat">
-          <option>AIR</option>
-          <option>WATER</option>
-          <option>SOIL</option>
-          <option>SAND</option>
-          <option>STONE</option>
-          <option>FUNGUS</option>
-        </select>
-      </label>
-      <label>
-        <span>Brush Size</span>
-        <input
-          id="brush-size"
-          type="number"
-          min="1"
-          max="10"
-          step="1"
-          value="2"
-        />
-      </label>
+      <canvas
+        id="map"
+        width="1000"
+        height="1000"
+        title="click or tap the map to paint"
+      ></canvas>
+      <section id="controls">
+        <section>
+          <button id="btn-pause" title="Pause/Resume the simulation">
+            Play
+          </button>
+          <button id="btn-tick" title="Run the simulation for a single step">
+            Step
+          </button>
+          <button id="btn-reset" title="Generate a new map">Reset</button>
+        </section>
+        <label>
+          <span>Brush</span>
+          <select id="brush-mat">
+            <option>AIR</option>
+            <option>WATER</option>
+            <option>SOIL</option>
+            <option>SAND</option>
+            <option>STONE</option>
+            <option>FUNGUS</option>
+          </select>
+        </label>
+        <label>
+          <span>Brush Size</span>
+          <input
+            id="brush-size"
+            type="number"
+            min="1"
+            max="10"
+            step="1"
+            value="2"
+          />
+        </label>
+      </section>
     </main>
   </body>
 </html>

@@ -14,8 +14,9 @@ const TILESET = {
   FUNGUS: "darkcyan",
 };
 const START_PAUSED = false;
+const DEBUG = false;
 
-const FPS = 10;
+const FPS = 30;
 let FRAME_TIMER;
 let WORLD;
 let RENDERER;
@@ -71,10 +72,7 @@ function setupControls() {
 }
 
 function _setPointerLocation(e) {
-  const rect = e.target.getBoundingClientRect();
-  const cx = e.clientX - rect.left;
-  const cy = e.clientY - rect.top;
-  const { x, y } = RENDERER.mapCoordinates(cx, cy);
+  const { x, y } = RENDERER.mapCoordinates(e.clientX, e.clientY);
   BRUSH_X = x;
   BRUSH_Y = y;
 }
@@ -84,27 +82,31 @@ function init() {
   WORLD = new World(ROW_COUNT, COL_COUNT);
   RENDERER = new Renderer(document.getElementById("map"), WORLD, TILESET);
   RENDERER.draw();
-  console.log(WORLD);
+  if (DEBUG) console.log(WORLD);
 }
 
 function gameLoop(loop = true) {
   const start = Date.now();
 
-  doInput();
+  doInput(false);
   WORLD.tick();
   RENDERER.draw();
 
-  const elapsed = Date.now() - start;
-  console.log("Tick Duration ms:", elapsed);
+  if (DEBUG) {
+    const elapsed = Date.now() - start;
+    console.log(`Tick ${WORLD.age} completed in ${elapsed}ms`);
+  }
+
   const delayMS = Math.max(Math.round(start + 1000 / FPS) - Date.now(), 0);
   if (loop) {
     FRAME_TIMER = setTimeout(gameLoop, delayMS);
   }
 }
 
-function doInput() {
+function doInput(draw = true) {
   if (!BRUSH_ON) return;
   const brushSize = Math.round($("#brush-size").val());
   const brushMat = $("#brush-mat").val();
   WORLD.fillCircle(BRUSH_X, BRUSH_Y, brushSize, brushMat);
+  if (draw) RENDERER.draw();
 }
