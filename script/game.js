@@ -16,7 +16,7 @@ const TILESET = {
 const START_PAUSED = false;
 const DEBUG = false;
 
-const FPS = 10;
+const FPS = 30;
 let FRAME_TIMER;
 let WORLD;
 let RENDERER;

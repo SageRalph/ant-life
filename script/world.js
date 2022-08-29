@@ -1,3 +1,5 @@
+const QUEEN_SPEED = 0.1;
+
 class World {
   constructor(rows, cols, generatorSettings = {}) {
     this.rows = rows;
@@ -202,6 +204,7 @@ class World {
       case "QUEEN":
         // when touching fungus, converts one fungus to egg, else move any direction towards closest fungus
         return (
+          Math.random() >= QUEEN_SPEED ||
           this._convertTileIf(x - 1, y - 1, "EGG", ["FUNGUS"]) ||
           this._convertTileIf(x + 1, y - 1, "EGG", ["FUNGUS"]) ||
           this._convertTileIf(x, y - 1, "EGG", ["FUNGUS"]) ||
