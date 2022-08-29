@@ -107,6 +107,11 @@ function doInput(draw = true) {
   if (!BRUSH_ON) return;
   const brushSize = Math.round($("#brush-size").val());
   const brushMat = $("#brush-mat").val();
-  WORLD.fillCircle(BRUSH_X, BRUSH_Y, brushSize, brushMat);
+  WORLD.fillCircle(BRUSH_X, BRUSH_Y, brushSize, brushMat, [
+    "AIR",
+    "SOIL",
+    "SAND",
+    "PLANT",
+  ]);
   if (draw) RENDERER.draw();
 }
