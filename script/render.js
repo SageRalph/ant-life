@@ -6,7 +6,6 @@ class Renderer {
     this._ctx = canvas.getContext("2d");
     this._cw = canvas.width / world.cols;
     this._ch = canvas.height / world.rows;
-    console.log(canvas);
   }
 
   draw() {
