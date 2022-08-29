@@ -20,12 +20,8 @@ let WORLD;
 let RENDERER;
 
 $(document).ready(function () {
-  console.log("Loading...");
-  WORLD = new World(ROW_COUNT, COL_COUNT);
-  RENDERER = new Renderer(document.getElementById("map"), WORLD, TILESET);
-  console.log(WORLD);
+  init();
   setupControls();
-  RENDERER.draw();
 });
 
 function setupControls() {
@@ -42,6 +38,22 @@ function setupControls() {
   $("#btn-tick").on("click", function () {
     gameLoop(false);
   });
+  $("#btn-reset").on("click", function () {
+    init();
+    if (FRAME_TIMER) {
+      clearTimeout(FRAME_TIMER);
+      FRAME_TIMER = null;
+      $("#btn-pause").text("Play");
+    }
+  });
+}
+
+function init() {
+  console.log("Loading...");
+  WORLD = new World(ROW_COUNT, COL_COUNT);
+  RENDERER = new Renderer(document.getElementById("map"), WORLD, TILESET);
+  RENDERER.draw();
+  console.log(WORLD);
 }
 
 function gameLoop(loop = true) {
