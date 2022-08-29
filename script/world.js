@@ -296,7 +296,12 @@ class World {
         const dy = randomIntInclusive(-1, 1);
         return (
           (dy < 1 || this._touching(x + dx, y + dy, climbMask) > 2) &&
-          this._swapTilesIf(x, y, x + dx, y + dy, ["AIR", "EGG", "SAND"])
+          this._swapTilesIf(x, y, x + dx, y + dy, [
+            "AIR",
+            "EGG",
+            "PLANT",
+            "FUNGUS",
+          ])
         );
 
       case "EGG":
