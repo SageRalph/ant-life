@@ -12,9 +12,10 @@ const TILESET = {
   PLANT: "olivedrab",
   WATER: "blue",
   FUNGUS: "teal",
+  PEST: "fuchsia",
 };
 const START_PAUSED = false;
-const DEBUG = false;
+let DEBUG = false;
 
 const FPS = 30;
 let FRAME_TIMER;
@@ -86,7 +87,7 @@ function init() {
   RENDERER = new Renderer(document.getElementById("map"), WORLD, TILESET);
   RENDERER.draw();
   $("#info").html(`
-    Spring has sprung and plants are sprouting <br/>
+    Spring has arrived and plants are sprouting <br/>
     Guide your queen (purple) to fungus (teal) to begin your new colony
   `);
   if (DEBUG) console.log(WORLD);
@@ -101,7 +102,7 @@ function gameLoop(loop = true) {
 
   if (LAST_ANT_COUNT === 1 && WORLD.ants > 1) {
     $("#info").html(`
-      Your first workers (red) have begun to hatch from eggs (white) <br/> 
+      The first workers (red) have begun to hatch from eggs (white) <br/> 
       Grow more fungus (teal) by bringing it plant material (green)
     `);
   }
@@ -119,6 +120,16 @@ function gameLoop(loop = true) {
     $("#info").html(`
     The rains have stopped for now, but will return regularly <br/>
     Water (blue) evaporates in the sun and is absorbed by plants (green)
+  `);
+  } else if (WORLD.age === 3500) {
+    $("#info").html(`
+    Pests (pink) will soon be attracted by the new growth <br/>
+    Pests will hunt for eggs (white) but workers (red) will fight back
+  `);
+  } else if (WORLD.age === 4300) {
+    $("#info").html(`
+    Stay on guard for more pests and rainfall <br/>
+    Protect the queen and grow the colony by farming fungus
   `);
   }
 

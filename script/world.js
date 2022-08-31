@@ -3,6 +3,8 @@ const KILL_CHANCE = 0.01; // Chance per tick for each neighbouring hazard to kil
 const GROW_CHANCE = 0.1; // Base chance per tick for a lone plant tile to grow (reduced by crowding)
 const RAIN_FREQ = 2500; // How often (in game ticks) it rains
 const RAIN_TIME = 500; // How long (in game ticks) it rains for
+const PEST_FREQ = 400; // How often (in game ticks) a pest enters the map
+const PEST_START = 4000; // How long (in game ticks) before pests can spawn
 
 // Tiles ants can climb
 const ANT_CLIMB_MASK = [
@@ -16,7 +18,11 @@ const ANT_CLIMB_MASK = [
 ];
 
 // Tiles ants can move through
-const ANT_WALK_MASK = ["AIR", "EGG", "PLANT", "FUNGUS"];
+const ANT_WALK_MASK = ["AIR", "CORPSE", "EGG", "PLANT", "FUNGUS"];
+
+// Tiles pests can move through
+const PEST_WALK_MASK = ["AIR", "CORPSE", "FUNGUS"];
+
 class World {
   constructor(rows, cols, generatorSettings = {}) {
     this.rows = rows;
@@ -30,23 +36,24 @@ class World {
   tick() {
     this.age += 1;
 
+    // Tile actions
     for (let y = 0; y < this.rows; y++) {
       for (let x = 0; x < this.cols; x++) {
         this._doTileAction(x, y);
       }
     }
 
+    // Rain
     if (this.age >= RAIN_FREQ && this.age % RAIN_FREQ <= RAIN_TIME) {
       this._doRain(randomIntInclusive(this.cols / 100, this.cols / 50));
+    } // Pests (never at same time as rain)
+    else if (this.age >= PEST_START && this.age % PEST_FREQ === 0) {
+      this._doRain(randomIntInclusive(1, this.cols / 30), "PEST");
     }
   }
 
   getTile(x, y) {
     return this.tiles[y][x];
-  }
-
-  setTile(x, y, tile) {
-    this.tiles[y][x] = tile;
   }
 
   fillCircle(centerX, centerY, radius, tile, mask = []) {
@@ -59,7 +66,7 @@ class World {
       function (x, y) {
         if (mask.length && !me._is(x, y, mask)) return;
         if (!pointWithinRadius(centerX, centerY, x, y, radius)) return;
-        me.setTile(x, y, tile);
+        me._setTile(x, y, tile);
       },
     );
   }
@@ -68,7 +75,7 @@ class World {
     const me = this;
     this._doWithinBounds(minX, minY, maxX, maxY, function (x, y) {
       if (mask.length && !me._is(x, y, mask)) return;
-      me.setTile(x, y, tile);
+      me._setTile(x, y, tile);
     });
   }
 
@@ -205,7 +212,7 @@ class World {
     }
 
     // Starting units
-    this.setTile(midX, surfaceY, "QUEEN");
+    this._setTile(midX, surfaceY, "QUEEN");
   }
 
   _doTileAction(x, y) {
@@ -215,22 +222,22 @@ class World {
       case "SAND":
         // move down or diagonally down
         return (
-          this._swapTilesIf(x, y, x, y - 1, ["AIR", "WATER"]) ||
-          this._swapTilesIf(x, y, x + bias, y - 1, ["AIR", "WATER"]) ||
-          this._swapTilesIf(x, y, x - bias, y - 1, ["AIR", "WATER"])
+          this._swapTiles(x, y, x, y - 1, ["AIR", "WATER"]) ||
+          this._swapTiles(x, y, x + bias, y - 1, ["AIR", "WATER"]) ||
+          this._swapTiles(x, y, x - bias, y - 1, ["AIR", "WATER"])
         );
 
       case "CORPSE":
         // when touching plant, convert to plant
         if (Math.random() <= KILL_CHANCE * this._touching(x, y, ["PLANT"])) {
-          return this.setTile(x, y, "PLANT");
+          return this._setTile(x, y, "PLANT");
         }
 
         // move down or diagonally down
         return (
-          this._swapTilesIf(x, y, x, y - 1, ["AIR"]) ||
-          this._swapTilesIf(x, y, x - bias, y - 1, ["AIR"]) ||
-          this._swapTilesIf(x, y, x + bias, y - 1, ["AIR"])
+          this._swapTiles(x, y, x, y - 1, ["AIR"]) ||
+          this._swapTiles(x, y, x - bias, y - 1, ["AIR"]) ||
+          this._swapTiles(x, y, x + bias, y - 1, ["AIR"])
         );
 
       case "WATER":
@@ -242,15 +249,15 @@ class World {
             this._is(x + 1, y, ["AIR"]) ||
             this._touching(x, y, ["PLANT"]))
         ) {
-          return this.setTile(x, y, "AIR");
+          return this._setTile(x, y, "AIR");
         }
 
         // move down or diagonally down or sideways
         return (
-          this._swapTilesIf(x, y, x, y - 1, ["AIR", "CORPSE"]) ||
-          this._swapTilesIf(x, y, x + bias, y - 1, ["AIR", "CORPSE"]) ||
-          this._swapTilesIf(x, y, x - bias, y - 1, ["AIR", "CORPSE"]) ||
-          this._swapTilesIf(x, y, x + bias, y, ["AIR", "CORPSE"])
+          this._swapTiles(x, y, x, y - 1, ["AIR", "CORPSE"]) ||
+          this._swapTiles(x, y, x + bias, y - 1, ["AIR", "CORPSE"]) ||
+          this._swapTiles(x, y, x - bias, y - 1, ["AIR", "CORPSE"]) ||
+          this._swapTiles(x, y, x + bias, y, ["AIR", "CORPSE"])
         );
 
       case "PLANT":
@@ -264,7 +271,7 @@ class World {
 
         // when touching fungus, convert to fungus
         if (Math.random() <= KILL_CHANCE * this._touching(x, y, ["FUNGUS"])) {
-          return this.setTile(x, y, "FUNGUS");
+          return this._setTile(x, y, "FUNGUS");
         }
 
         // chance to grow up/down or left/right or diagonal
@@ -274,9 +281,9 @@ class World {
         ) {
           const growMask = ["AIR", "WATER", "CORPSE"];
           return (
-            this._convertTileIf(x, y + bias2, "PLANT", growMask) ||
-            this._convertTileIf(x + bias, y + bias2, "PLANT", growMask)
-            // this._convertTileIf(x + bias, y, "PLANT", growMask) ||
+            this._setTile(x, y + bias2, "PLANT", growMask) ||
+            this._setTile(x + bias, y + bias2, "PLANT", growMask)
+            // this._setTile(x + bias, y, "PLANT", growMask) ||
           );
         }
         return;
@@ -284,62 +291,93 @@ class World {
       case "FUNGUS":
         // Destroyed by air
         if (Math.random() <= KILL_CHANCE && this._exposedToSky(x, y)) {
-          return this.setTile(x, y, "SAND");
+          return this._setTile(x, y, "SAND");
         }
         return;
 
       case "QUEEN":
         // Destroyed by water
         if (Math.random() <= KILL_CHANCE * this._touching(x, y, ["WATER"])) {
-          return this.setTile(x, y, "CORPSE");
+          return this._setTile(x, y, "CORPSE");
         }
         // when touching fungus, converts one to egg, else move any direction towards closest fungus
-        return (
-          Math.random() >= QUEEN_SPEED ||
-          this._convertTileIf(x - 1, y - 1, "EGG", ["FUNGUS"]) ||
-          this._convertTileIf(x + 1, y - 1, "EGG", ["FUNGUS"]) ||
-          this._convertTileIf(x, y - 1, "EGG", ["FUNGUS"]) ||
-          this._convertTileIf(x - 1, y, "EGG", ["FUNGUS"]) ||
-          this._convertTileIf(x + 1, y, "EGG", ["FUNGUS"]) ||
-          this._convertTileIf(x - 1, y + 1, "EGG", ["FUNGUS"]) ||
-          this._convertTileIf(x + 1, y + 1, "EGG", ["FUNGUS"]) ||
-          this._convertTileIf(x, y + 1, "EGG", ["FUNGUS"]) ||
-          this._searchForTile(x, y, "FUNGUS", 20, ANT_WALK_MASK)
-        );
+        if (Math.random() <= QUEEN_SPEED) {
+          return (
+            this._setOneTouching(x, y, "EGG", ["FUNGUS"]) ||
+            this._searchForTile(x, y, "FUNGUS", 20, ANT_WALK_MASK)
+          );
+        }
+        return false;
 
       case "ANT":
         // Destroyed by water
         if (Math.random() <= KILL_CHANCE * this._touching(x, y, ["WATER"])) {
-          return this.setTile(x, y, "CORPSE");
+          return this._setTile(x, y, "CORPSE");
         }
 
-        // TODO - ants currently just move randomly
-        const dx = randomIntInclusive(-1, 1);
-        const dy = randomIntInclusive(-1, 1);
-        return (
-          (dy < 1 || this._touching(x + dx, y + dy, ANT_CLIMB_MASK) > 1) &&
-          this._swapTilesIf(x, y, x + dx, y + dy, ANT_WALK_MASK)
-        );
+        return this._antMove(x, y);
+
+      case "PEST":
+        // Destroyed by water and ants
+        if (
+          Math.random() <=
+          KILL_CHANCE * this._touching(x, y, ["WATER", "ANT"])
+        ) {
+          return this._setTile(x, y, "CORPSE");
+        }
+
+        // Fight ants, queens, eggs
+        // Note: this is asymmetric so groups of ants fight better than pests.
+        // Pests are hit by all neighbouring ants but only hit one ant per tick.
+        if (Math.random() <= KILL_CHANCE) {
+          if (this._setOneTouching(x, y, "CORPSE", ["ANT", "EGG", "QUEEN"])) {
+            return true;
+          }
+        }
+
+        return this._pestMove(x, y);
 
       case "EGG":
         // Destroyed by water
         if (Math.random() <= KILL_CHANCE * this._touching(x, y, ["WATER"])) {
-          return this.setTile(x, y, "CORPSE");
+          return this._setTile(x, y, "CORPSE");
         }
 
         // chance to convert to ant, else move down or diagonally down
         if (Math.random() <= 0.001) {
           // hatch into QUEEN or ANT
-          this.setTile(x, y, Math.random() < 0.01 ? "QUEEN" : "ANT");
+          this._setTile(x, y, Math.random() < 0.01 ? "QUEEN" : "ANT");
           this.ants++;
           return true;
         }
         return (
-          this._swapTilesIf(x, y, x, y - 1, ["AIR", "WATER"]) ||
-          this._swapTilesIf(x, y, x - bias, y - 1, ["AIR", "WATER"]) ||
-          this._swapTilesIf(x, y, x + bias, y - 1, ["AIR", "WATER"])
+          this._swapTiles(x, y, x, y - 1, ["AIR", "WATER"]) ||
+          this._swapTiles(x, y, x - bias, y - 1, ["AIR", "WATER"]) ||
+          this._swapTiles(x, y, x + bias, y - 1, ["AIR", "WATER"])
         );
     }
+  }
+
+  _antMove(x, y) {
+    // TODO - ants currently just move randomly
+    const dx = randomIntInclusive(-1, 1);
+    const dy = randomIntInclusive(-1, 1);
+    return (
+      (dy < 1 || this._touching(x + dx, y + dy, ANT_CLIMB_MASK) > 1) &&
+      this._swapTiles(x, y, x + dx, y + dy, ANT_WALK_MASK)
+    );
+  }
+
+  _pestMove(x, y) {
+    // Seek out eggs
+    if (this._searchForTile(x, y, "EGG", 10, ANT_WALK_MASK)) {
+      return true;
+    }
+    // move randomly
+    // Note: random movement uses a reduced tileset to avoid helping farm
+    let dx = randomIntInclusive(-1, 1);
+    let dy = randomIntInclusive(-1, 1);
+    return this._swapTiles(x, y, x + dx, y + dy, PEST_WALK_MASK);
   }
 
   _legal(x, y) {
@@ -357,7 +395,7 @@ class World {
   _doRain(count, tile = "WATER") {
     for (let i = 0; i < count; i++) {
       const x = randomIntInclusive(0, this.cols - 1);
-      this._convertTileIf(x, this.rows - 1, tile, ["AIR"]);
+      this._setTile(x, this.rows - 1, tile, ["AIR"]);
     }
   }
 
@@ -369,48 +407,58 @@ class World {
   }
 
   _touching(x, y, mask, radius = 1) {
+    return this._touchingWhich(x, y, mask, radius).length;
+  }
+
+  _touchingWhich(x, y, mask, radius = 1) {
     const me = this;
-    let count = 0;
+    const touching = [];
     this._doWithinBounds(
       x - radius,
       y - radius,
       x + radius,
       y + radius,
       function (a, b) {
-        if (me._is(a, b, mask) && (a !== x || b !== y)) count++;
+        if (me._is(a, b, mask) && (a !== x || b !== y)) touching.push({ a, b });
       },
     );
-    return count;
+    return touching;
   }
 
   _is(x, y, mask) {
     if (!this._legal(x, y)) return false;
+    if (!mask) return true;
     return mask.includes(this.getTile(x, y));
   }
 
-  _swapTiles(x, y, a, b) {
-    const t1 = this.getTile(x, y);
-    const t2 = this.getTile(a, b);
-    this.setTile(a, b, t1);
-    this.setTile(x, y, t2);
-  }
-
-  _swapTilesIf(x, y, a, b, mask) {
+  _swapTiles(x, y, a, b, mask = false) {
     if (!this._is(a, b, mask)) {
       return false;
     } else {
-      this._swapTiles(x, y, a, b);
+      const t1 = this.getTile(x, y);
+      const t2 = this.getTile(a, b);
+      this._setTile(a, b, t1);
+      this._setTile(x, y, t2);
       return true;
     }
   }
 
-  _convertTileIf(x, y, tile, mask) {
+  _setTile(x, y, tile, mask = false) {
     if (!this._is(x, y, mask)) {
       return false;
     } else {
-      this.setTile(x, y, tile);
+      this.tiles[y][x] = tile;
       return true;
     }
+  }
+
+  _setOneTouching(x, y, tile, mask) {
+    const targets = this._touchingWhich(x, y, mask);
+    if (targets.length) {
+      const target = targets[randomIntInclusive(0, targets.length - 1)];
+      return this._setTile(target.a, target.b, tile);
+    }
+    return false;
   }
 
   _searchForTile(x, y, tile, radius, walkableMask = ["AIR"]) {
@@ -429,9 +477,9 @@ class World {
 
             // move towards if possible
             if (
-              this._swapTilesIf(x, y, desiredX, desiredY, walkableMask) ||
-              this._swapTilesIf(x, y, x, desiredY, walkableMask) ||
-              this._swapTilesIf(x, y, desiredX, y, walkableMask)
+              this._swapTiles(x, y, desiredX, desiredY, walkableMask) ||
+              this._swapTiles(x, y, x, desiredY, walkableMask) ||
+              this._swapTiles(x, y, desiredX, y, walkableMask)
             ) {
               return true;
             }
