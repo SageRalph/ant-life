@@ -110,6 +110,18 @@ function gameLoop(loop = true) {
   }
   LAST_ANT_COUNT = WORLD.ants;
 
+  if (WORLD.age === 2000) {
+    $("#info").html(`
+      The spring rains will start soon, prepare for the flood! <br/>
+      Water (blue) kills workers (red), queens (purple), and eggs (white)
+    `);
+  } else if (WORLD.age === 3000) {
+    $("#info").html(`
+    The rains have stopped for now, but will return regularly <br/>
+    Water (blue) evaporates in the sun and is absorbed by plants (green)
+  `);
+  }
+
   if (DEBUG) {
     const elapsed = Date.now() - start;
     console.log(`Tick ${WORLD.age} completed in ${elapsed}ms`);

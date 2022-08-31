@@ -1,6 +1,8 @@
 const QUEEN_SPEED = 0.1; // The queen will only act this proportion of ticks
 const KILL_CHANCE = 0.01; // Chance per tick for each neighbouring hazard to kill
 const GROW_CHANCE = 0.1; // Base chance per tick for a lone plant tile to grow (reduced by crowding)
+const RAIN_FREQ = 2500; // How often (in game ticks) it rains
+const RAIN_TIME = 500; // How long (in game ticks) it rains for
 
 // Tiles ants can climb
 const ANT_CLIMB_MASK = [
@@ -32,6 +34,10 @@ class World {
       for (let x = 0; x < this.cols; x++) {
         this._doTileAction(x, y);
       }
+    }
+
+    if (this.age >= RAIN_FREQ && this.age % RAIN_FREQ <= RAIN_TIME) {
+      this._doRain(randomIntInclusive(this.cols / 100, this.cols / 50));
     }
   }
 
@@ -220,12 +226,13 @@ class World {
         );
 
       case "WATER":
-        // chance to evaporate if no water to left/right
+        // chance to evaporate under sky or if air to left/right or near plant
         if (
           Math.random() <= KILL_CHANCE &&
           (this._exposedToSky(x, y) ||
             this._is(x - 1, y, ["AIR"]) ||
-            this._is(x + 1, y, ["AIR"]))
+            this._is(x + 1, y, ["AIR"]) ||
+            this._touching(x, y, ["PLANT"]))
         ) {
           return this.setTile(x, y, "AIR");
         }
@@ -336,6 +343,13 @@ class World {
       for (let x = Math.max(minX, 0); x <= Math.min(maxX, this.rows - 1); x++) {
         func(x, y);
       }
+    }
+  }
+
+  _doRain(count, tile = "WATER") {
+    for (let i = 0; i < count; i++) {
+      const x = randomIntInclusive(0, this.cols - 1);
+      this._convertTileIf(x, this.rows - 1, tile, ["AIR"]);
     }
   }
 
