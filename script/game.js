@@ -81,12 +81,11 @@ function _setPointerLocation(e) {
 
 function init() {
   if (DEBUG) console.log("Loading...");
-  $("#info").html("Loading...");
   $("#score").text("");
   WORLD = new World(ROW_COUNT, COL_COUNT);
   RENDERER = new Renderer(document.getElementById("map"), WORLD, TILESET);
   RENDERER.draw();
-  $("#info").html(`
+  prompt(`
     Spring has arrived and plants are sprouting <br/>
     Guide your queen (purple) to fungus (teal) to begin your new colony
   `);
@@ -101,7 +100,7 @@ function gameLoop(loop = true) {
   RENDERER.draw();
 
   if (LAST_ANT_COUNT === 1 && WORLD.ants > 1) {
-    $("#info").html(`
+    prompt(`
       The first workers (red) have begun to hatch from eggs (white) <br/> 
       Grow more fungus (teal) by bringing it plant material (green)
     `);
@@ -112,22 +111,22 @@ function gameLoop(loop = true) {
   LAST_ANT_COUNT = WORLD.ants;
 
   if (WORLD.age === 2000) {
-    $("#info").html(`
+    prompt(`
       The spring rains will start soon, prepare for the flood! <br/>
       Water (blue) kills workers (red), queens (purple), and eggs (white)
     `);
   } else if (WORLD.age === 3000) {
-    $("#info").html(`
+    prompt(`
     The rains have stopped for now, but will return regularly <br/>
     Water (blue) evaporates in the sun and is absorbed by plants (green)
   `);
   } else if (WORLD.age === 3500) {
-    $("#info").html(`
+    prompt(`
     Pests (pink) will soon be attracted by the new growth <br/>
     Pests will hunt for eggs (white) but workers (red) will fight back
   `);
   } else if (WORLD.age === 4300) {
-    $("#info").html(`
+    prompt(`
     Stay on guard for more pests and rainfall <br/>
     Protect the queen and grow the colony by farming fungus
   `);
@@ -154,4 +153,12 @@ function doInput(draw = true) {
     "SAND",
   ]);
   if (draw) RENDERER.draw();
+}
+
+function prompt(text) {
+  $("#info").html(text);
+  $("#info").addClass("alert");
+  setTimeout(function () {
+    $("#info").removeClass("alert");
+  }, 1000);
 }

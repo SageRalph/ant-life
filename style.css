@@ -43,6 +43,11 @@ body {
   text-align: center;
   background-color: rgba(0, 0, 0, 0.5);
   color: white;
+  transition-duration: 1s;
+}
+
+#info.alert {
+  background-color: rgba(200, 0, 0, 0.8);
 }
 
 #score {
@@ -55,7 +60,7 @@ body {
   margin-bottom: 1rem;
 }
 
-summary{
+summary {
   cursor: pointer;
 }
 
