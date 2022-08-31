@@ -258,7 +258,7 @@ class World {
         // Destroyed by air
         if (
           Math.random() <=
-          KILL_CHANCE * (this._touching(x, y, ["AIR"]) - 2)
+          KILL_CHANCE * (this._touching(x, y, ["AIR"]) - 3)
         ) {
           return this.setTile(x, y, "SAND");
         }
