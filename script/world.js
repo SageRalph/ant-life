@@ -221,6 +221,11 @@ class World {
         );
 
       case "CORPSE":
+        // when touching plant, convert to plant
+        if (Math.random() <= KILL_CHANCE * this._touching(x, y, ["PLANT"])) {
+          return this.setTile(x, y, "PLANT");
+        }
+
         // move down or diagonally down
         return (
           this._swapTilesIf(x, y, x, y - 1, ["AIR"]) ||
