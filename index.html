@@ -29,13 +29,17 @@
   <body>
     <main id="content">
       <h1 id="banner">Ant Life</h1>
-      <p>A game with bugs</p>
+      <p>A game with <span id="score"></span> bugs</p>
+
+      <p id="info">Loading...</p>
+
       <canvas
         id="map"
         width="1000"
         height="1000"
         title="click or tap the map to paint"
       ></canvas>
+
       <section id="controls">
         <section>
           <button id="btn-pause" title="Pause/Resume the simulation">

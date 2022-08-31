@@ -20,6 +20,7 @@ class World {
     this.rows = rows;
     this.cols = cols;
     this.age = 0;
+    this.ants = 1;
     this.generatorSettings = generatorSettings;
     this._generate(generatorSettings);
   }
@@ -280,7 +281,7 @@ class World {
           this._convertTileIf(x - 1, y + 1, "EGG", ["FUNGUS"]) ||
           this._convertTileIf(x + 1, y + 1, "EGG", ["FUNGUS"]) ||
           this._convertTileIf(x, y + 1, "EGG", ["FUNGUS"]) ||
-          this._searchForTile(x, y, "FUNGUS", 10, ANT_WALK_MASK)
+          this._searchForTile(x, y, "FUNGUS", 20, ANT_WALK_MASK)
         );
 
       case "ANT":
@@ -307,6 +308,7 @@ class World {
         if (Math.random() <= 0.001) {
           // hatch into QUEEN or ANT
           this.setTile(x, y, Math.random() < 0.01 ? "QUEEN" : "ANT");
+          this.ants++;
           return true;
         }
         return (
