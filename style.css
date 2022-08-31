@@ -36,6 +36,12 @@ body {
   width: 100%;
 }
 
+#fps {
+  float: right;
+  position: relative;
+  margin-bottom: -2rem;
+}
+
 #info {
   width: 100%;
   margin: 0;

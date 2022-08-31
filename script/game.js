@@ -17,8 +17,9 @@ const TILESET = {
 const START_PAUSED = false;
 let DEBUG = false;
 
-const FPS = 30;
 let FRAME_TIMER;
+let LAST_FRAME_TIME = performance.now();
+let FPS_TIME = 0;
 let WORLD;
 let RENDERER;
 let BRUSH_ON = false;
@@ -37,7 +38,7 @@ $(document).ready(function () {
 function setupControls() {
   $("#btn-pause").on("click", function () {
     if (FRAME_TIMER) {
-      clearTimeout(FRAME_TIMER);
+      cancelAnimationFrame(FRAME_TIMER);
       FRAME_TIMER = null;
       $(this).text("Play");
     } else {
@@ -53,7 +54,7 @@ function setupControls() {
   $("#btn-reset").on("click", function () {
     init();
     if (START_PAUSED && FRAME_TIMER) {
-      clearTimeout(FRAME_TIMER);
+      cancelAnimationFrame(FRAME_TIMER);
       FRAME_TIMER = null;
       $("#btn-pause").text("Play");
     }
@@ -93,7 +94,7 @@ function init() {
 }
 
 function gameLoop(loop = true) {
-  const start = Date.now();
+  const start = performance.now();
 
   doInput(false);
   WORLD.tick();
@@ -133,13 +134,21 @@ function gameLoop(loop = true) {
   }
 
   if (DEBUG) {
-    const elapsed = Date.now() - start;
+    const elapsed = performance.now() - start;
     console.log(`Tick ${WORLD.age} completed in ${elapsed}ms`);
   }
 
-  const delayMS = Math.max(Math.round(start + 1000 / FPS) - Date.now(), 0);
   if (loop) {
-    FRAME_TIMER = setTimeout(gameLoop, delayMS);
+    // Calculate FPS
+    const thisFrameTime = (thisLoop = performance.now()) - LAST_FRAME_TIME;
+    FPS_TIME += (thisFrameTime - FPS_TIME) / 5;
+    LAST_FRAME_TIME = thisLoop;
+    $("#fps").text(`${Math.round(1000 / FPS_TIME)} FPS`);
+
+    // Request every-other v-blank
+    FRAME_TIMER = requestAnimationFrame(() => {
+      FRAME_TIMER = requestAnimationFrame(gameLoop);
+    });
   }
 }
 
