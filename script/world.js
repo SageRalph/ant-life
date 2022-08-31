@@ -45,7 +45,17 @@ class World {
 
     // Rain
     if (this.age >= RAIN_FREQ && this.age % RAIN_FREQ <= RAIN_TIME) {
-      this._doRain(randomIntInclusive(this.cols / 100, this.cols / 50));
+      const maxRain = randomIntInclusive(1, 5);
+      const rainProgress = this.age % RAIN_FREQ;
+      const rainCount =
+        (Math.min(
+          rainProgress ** 2 / 10000,
+          maxRain,
+          (RAIN_TIME - rainProgress) ** 2 / 10000,
+        ) *
+          this.cols) /
+        100;
+      this._doRain(rainCount);
     } // Pests (never at same time as rain)
     else if (this.age >= PEST_START && this.age % PEST_FREQ === 0) {
       this._doRain(randomIntInclusive(1, this.cols / 30), "PEST");
@@ -393,7 +403,12 @@ class World {
   }
 
   _doRain(count, tile = "WATER") {
-    for (let i = 0; i < count; i++) {
+    // allow for non-int chance
+    let realCount = Math.floor(count);
+    if (Math.random() <= count % 1) {
+      realCount++;
+    }
+    for (let i = 0; i < realCount; i++) {
       const x = randomIntInclusive(0, this.cols - 1);
       this._setTile(x, this.rows - 1, tile, ["AIR"]);
     }
