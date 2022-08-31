@@ -422,6 +422,10 @@ class World {
   }
 
   _generatePatches(count, maxHeight, minSize, maxSize, tile, mask) {
+    // Scale based on map size (counts are for default 100x100 map)
+    const tileCount = this.rows * this.cols;
+    count = (count * tileCount) / 10000;
+
     for (let i = 0; i < count; i++) {
       this.fillCircle(
         randomIntInclusive(0, this.cols),
