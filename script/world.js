@@ -1,9 +1,11 @@
 const QUEEN_SPEED = 0.1; // The queen will only act this proportion of ticks
-const KILL_CHANCE = 0.01; // Chance per tick for each neighbouring hazard to kill
+const KILL_CHANCE = 0.01; // Chance per tick for each hazard to kill
+const EVAPORATE_CHANCE = 0.01; // Chance per tick for water to evaporate
+const CONVERT_CHANCE = 0.01; // Chance per tick for fungus/plant to convert
 const GROW_CHANCE = 0.1; // Base chance per tick for a lone plant tile to grow (reduced by crowding)
 const RAIN_FREQ = 2500; // How often (in game ticks) it rains
 const RAIN_TIME = 500; // How long (in game ticks) it rains for
-const PEST_FREQ = 400; // How often (in game ticks) a pest enters the map
+const PEST_FREQ = 100; // How often (in game ticks) a pest enters the map
 const PEST_START = 4000; // How long (in game ticks) before pests can spawn
 
 // Tiles ants can climb
@@ -58,7 +60,7 @@ class World {
       this._doRain(rainCount);
     } // Pests (never at same time as rain)
     else if (this.age >= PEST_START && this.age % PEST_FREQ === 0) {
-      this._doRain(randomIntInclusive(1, this.cols / 30), "PEST");
+      this._doRain(Math.random(), "PEST");
     }
   }
 
@@ -239,7 +241,7 @@ class World {
 
       case "CORPSE":
         // when touching plant, convert to plant
-        if (Math.random() <= KILL_CHANCE * this._touching(x, y, ["PLANT"])) {
+        if (Math.random() <= CONVERT_CHANCE * this._touching(x, y, ["PLANT"])) {
           return this._setTile(x, y, "PLANT");
         }
 
@@ -253,7 +255,7 @@ class World {
       case "WATER":
         // chance to evaporate under sky or if air to left/right or near plant
         if (
-          Math.random() <= KILL_CHANCE &&
+          Math.random() <= EVAPORATE_CHANCE &&
           (this._exposedToSky(x, y) ||
             this._is(x - 1, y, ["AIR"]) ||
             this._is(x + 1, y, ["AIR"]) ||
@@ -280,7 +282,10 @@ class World {
         }
 
         // when touching fungus, convert to fungus
-        if (Math.random() <= KILL_CHANCE * this._touching(x, y, ["FUNGUS"])) {
+        if (
+          Math.random() <=
+          CONVERT_CHANCE * this._touching(x, y, ["FUNGUS"])
+        ) {
           return this._setTile(x, y, "FUNGUS");
         }
 
@@ -339,7 +344,8 @@ class World {
         // Fight ants, queens, eggs
         // Note: this is asymmetric so groups of ants fight better than pests.
         // Pests are hit by all neighbouring ants but only hit one ant per tick.
-        if (Math.random() <= KILL_CHANCE) {
+        // But pests have a higher base attack chance so typically win 1 on 1.
+        if (Math.random() <= KILL_CHANCE * 2) {
           if (this._setOneTouching(x, y, "CORPSE", ["ANT", "EGG", "QUEEN"])) {
             return true;
           }
@@ -380,7 +386,10 @@ class World {
 
   _pestMove(x, y) {
     // Seek out eggs
-    if (this._searchForTile(x, y, "EGG", 10, ANT_WALK_MASK)) {
+    if (this._searchForTile(x, y, "EGG", 20, ANT_WALK_MASK)) {
+      return true;
+    }
+    if (this._searchForTile(x, y, "ANT", 10, ANT_WALK_MASK)) {
       return true;
     }
     // move randomly
