@@ -1,12 +1,12 @@
 const QUEEN_SPEED = 0.1; // The queen will only act this proportion of ticks
 const KILL_CHANCE = 0.01; // Chance per tick for each neighbouring hazard to kill
+const GROW_CHANCE = 0.1; // Base chance per tick for a lone plant tile to grow (reduced by crowding)
 
 // Tiles ants can climb
 const ANT_CLIMB_MASK = [
   "SOIL",
   "SAND",
   "STONE",
-  "PLANT",
   "FUNGUS",
   "CORPSE",
   "ANT",
@@ -81,9 +81,7 @@ class World {
     hollowCount = 15,
     hollowMinSize = 4,
     hollowMaxSize = 10,
-    plantCount = 20,
-    plantMinSize = 4,
-    plantMaxSize = 6,
+    plantCount = 300,
     fungusCount = 30,
     fungusMinSize = 1,
     fungusMaxSize = 4,
@@ -144,16 +142,6 @@ class World {
       ["SOIL", "SAND", "STONE", "WATER"],
     );
 
-    // Plant
-    this._generatePatches(
-      plantCount,
-      surfaceY,
-      plantMinSize,
-      plantMaxSize,
-      "PLANT",
-      ["WATER", "AIR"],
-    );
-
     // Fungus
     this._generatePatches(
       fungusCount,
@@ -173,6 +161,12 @@ class World {
       "SOIL",
       ["SAND", "STONE", "WATER", "FUNGUS", "AIR", "PLANT"],
     );
+
+    // Plant seeds
+    this._generatePatches(plantCount, surfaceY + 3, 1, 1, "PLANT", [
+      "WATER",
+      "AIR",
+    ]);
 
     // Bedrock
     for (let x = 0; x < this.cols; x++) {
@@ -204,14 +198,15 @@ class World {
   }
 
   _doTileAction(x, y) {
-    const bias = Math.random > 0.5 ? 1 : -1;
+    const bias = Math.random() < 0.5 ? 1 : -1;
+    const bias2 = Math.random() < 0.5 ? 1 : -1;
     switch (this.getTile(x, y)) {
       case "SAND":
         // move down or diagonally down
         return (
           this._swapTilesIf(x, y, x, y - 1, ["AIR", "WATER"]) ||
-          this._swapTilesIf(x, y, x - bias, y - 1, ["AIR", "WATER"]) ||
-          this._swapTilesIf(x, y, x + bias, y - 1, ["AIR", "WATER"])
+          this._swapTilesIf(x, y, x + bias, y - 1, ["AIR", "WATER"]) ||
+          this._swapTilesIf(x, y, x - bias, y - 1, ["AIR", "WATER"])
         );
 
       case "CORPSE":
@@ -226,36 +221,35 @@ class World {
         // move down or diagonally down or sideways
         return (
           this._swapTilesIf(x, y, x, y - 1, ["AIR", "CORPSE"]) ||
-          this._swapTilesIf(x, y, x - bias, y - 1, ["AIR", "CORPSE"]) ||
           this._swapTilesIf(x, y, x + bias, y - 1, ["AIR", "CORPSE"]) ||
-          this._swapTilesIf(x, y, x - bias, y, ["AIR", "CORPSE"]) ||
+          this._swapTilesIf(x, y, x - bias, y - 1, ["AIR", "CORPSE"]) ||
           this._swapTilesIf(x, y, x + bias, y, ["AIR", "CORPSE"])
         );
 
       case "PLANT":
+        // when unsupported, move down
+        if (
+          this._is(x, y - 1, ["AIR", "WATER"]) &&
+          this._touching(x, y, ["PLANT"]) < 2
+        ) {
+          return this._swapTiles(x, y, x, y - 1);
+        }
+
         // when touching fungus, convert to fungus
         if (Math.random() <= KILL_CHANCE * this._touching(x, y, ["FUNGUS"])) {
           return this.setTile(x, y, "FUNGUS");
         }
 
-        // when touching air and water, convert one to plant
+        // chance to grow up/down or left/right or diagonal
         if (
           Math.random() <=
-          KILL_CHANCE *
-            this._touching(x, y, ["AIR"]) * // base chance from empty space
-            (this._touching(x, y, ["WATER"]) + 0.1) * // penalty if no water
-            (this._touching(x, y, ["CORPSE"]) + 1) // bonus if corpses
+          GROW_CHANCE / (this._touching(x, y, ["PLANT"], 3) ** 2 + 1)
         ) {
           const growMask = ["AIR", "WATER", "CORPSE"];
           return (
-            this._convertTileIf(x - 1, y - 1, "PLANT", growMask) ||
-            this._convertTileIf(x + 1, y - 1, "PLANT", growMask) ||
-            this._convertTileIf(x, y - 1, "PLANT", growMask) ||
-            this._convertTileIf(x - 1, y, "PLANT", growMask) ||
-            this._convertTileIf(x + 1, y, "PLANT", growMask) ||
-            this._convertTileIf(x - 1, y + 1, "PLANT", growMask) ||
-            this._convertTileIf(x + 1, y + 1, "PLANT", growMask) ||
-            this._convertTileIf(x, y + 1, "PLANT", ["AIR", "WATER", "CORPSE"])
+            this._convertTileIf(x, y + bias2, "PLANT", growMask) ||
+            this._convertTileIf(x + bias, y + bias2, "PLANT", growMask)
+            // this._convertTileIf(x + bias, y, "PLANT", growMask) ||
           );
         }
         return;
@@ -299,7 +293,7 @@ class World {
         const dx = randomIntInclusive(-1, 1);
         const dy = randomIntInclusive(-1, 1);
         return (
-          (dy < 1 || this._touching(x + dx, y + dy, ANT_CLIMB_MASK) > 2) &&
+          (dy < 1 || this._touching(x + dx, y + dy, ANT_CLIMB_MASK) > 1) &&
           this._swapTilesIf(x, y, x + dx, y + dy, ANT_WALK_MASK)
         );
 
@@ -335,12 +329,18 @@ class World {
     }
   }
 
-  _touching(x, y, mask) {
+  _touching(x, y, mask, radius = 1) {
     const me = this;
     let count = 0;
-    this._doWithinBounds(x - 1, y - 1, x + 1, y + 1, function (a, b) {
-      if (me._is(a, b, mask)) count++;
-    });
+    this._doWithinBounds(
+      x - radius,
+      y - radius,
+      x + radius,
+      y + radius,
+      function (a, b) {
+        if (me._is(a, b, mask) && (a !== x || b !== y)) count++;
+      },
+    );
     return count;
   }
 
