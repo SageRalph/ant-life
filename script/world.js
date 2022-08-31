@@ -91,6 +91,7 @@ class World {
     noiseMaxSize = 6,
   }) {
     const surfaceY = Math.round(this.rows * (1 - skyProp));
+    this.surfaceY = surfaceY;
     const midX = Math.round(this.cols / 2);
 
     // Build 2d tile array
@@ -219,6 +220,16 @@ class World {
         );
 
       case "WATER":
+        // chance to evaporate if no water to left/right
+        if (
+          Math.random() <= KILL_CHANCE &&
+          (this._exposedToSky(x, y) ||
+            this._is(x - 1, y, ["AIR"]) ||
+            this._is(x + 1, y, ["AIR"]))
+        ) {
+          return this.setTile(x, y, "AIR");
+        }
+
         // move down or diagonally down or sideways
         return (
           this._swapTilesIf(x, y, x, y - 1, ["AIR", "CORPSE"]) ||
@@ -257,10 +268,7 @@ class World {
 
       case "FUNGUS":
         // Destroyed by air
-        if (
-          Math.random() <=
-          KILL_CHANCE * (this._touching(x, y, ["AIR"]) - 3)
-        ) {
+        if (Math.random() <= KILL_CHANCE && this._exposedToSky(x, y)) {
           return this.setTile(x, y, "SAND");
         }
         return;
@@ -329,6 +337,13 @@ class World {
         func(x, y);
       }
     }
+  }
+
+  _exposedToSky(x, y) {
+    for (let i = y + 1; i < this.rows; i++) {
+      if (!this._is(x, i, ["AIR"])) return false;
+    }
+    return true;
   }
 
   _touching(x, y, mask, radius = 1) {
