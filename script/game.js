@@ -86,8 +86,8 @@ function init() {
   RENDERER = new Renderer(document.getElementById("map"), WORLD, TILESET);
   RENDERER.draw();
   $("#info").html(`
-    Spring has sprung and plants are sprouting. <br />
-    Guide your queen (purple) to fungus (teal) to begin your new colony.
+    Spring has sprung and plants are sprouting <br/>
+    Guide your queen (purple) to fungus (teal) to begin your new colony
   `);
   if (DEBUG) console.log(WORLD);
 }
@@ -101,8 +101,8 @@ function gameLoop(loop = true) {
 
   if (LAST_ANT_COUNT === 1 && WORLD.ants > 1) {
     $("#info").html(`
-      Your first workers (red) have begun to hatch. <br/> 
-      Grow more fungus (teal) by bringing it plant material (green).
+      Your first workers (red) have begun to hatch from eggs (white) <br/> 
+      Grow more fungus (teal) by bringing it plant material (green)
     `);
   }
   if (WORLD.ants > 1) {
