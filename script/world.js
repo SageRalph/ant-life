@@ -75,7 +75,7 @@ class World {
   _generate({
     skyProp = 0.2,
     startingAge = 100,
-    startAreaSize = 15,
+    startAreaSize = 10,
     sandCount = 50,
     sandMinSize = 4,
     sandMaxSize = 10,
@@ -170,11 +170,14 @@ class World {
       ["SAND", "STONE", "WATER", "FUNGUS", "AIR", "PLANT"],
     );
 
-    // Plant seeds
-    this._generatePatches(plantCount, surfaceY + 3, 1, 1, "PLANT", [
+    // Underground Plant
+    this._generatePatches(plantCount, surfaceY, 1, 1, "PLANT", [
       "WATER",
       "AIR",
     ]);
+
+    // Surface Plant
+    this._doRain(this.cols / 3, "PLANT");
 
     // Bedrock
     for (let x = 0; x < this.cols; x++) {
