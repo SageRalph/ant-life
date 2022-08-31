@@ -55,6 +55,33 @@ body {
   margin-bottom: 1rem;
 }
 
+summary{
+  cursor: pointer;
+}
+
+details {
+  margin-top: 2rem;
+  padding: 0 1rem;
+}
+
+details > *:not(summary) {
+  text-align: left;
+}
+
+ul {
+  padding-left: 20px;
+}
+
+table {
+  margin-top: 1rem;
+  width: 100%;
+}
+
+li,
+td {
+  padding: 0.5rem 0;
+}
+
 button {
   padding: 1rem;
   font-size: 1rem;
@@ -67,11 +94,11 @@ button {
   display: inline-block;
   flex-basis: 10rem;
   flex-grow: 1;
+  padding: 0.5rem;
 }
 
 label input,
 label select {
-  padding: 0.5rem;
   margin-left: 1rem;
 }
 
