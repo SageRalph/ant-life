@@ -11,6 +11,8 @@ class World {
   }
 
   tick() {
+    this._updateChunks();
+
     // Tile actions
     this.worldlogic.tick();
 
@@ -62,6 +64,72 @@ class World {
     if (!this._legal(x, y)) return false;
     if (!mask) return true;
     return mask.includes(this.getTile(x, y));
+  }
+
+  checkChunks(x, y, mask, distance = 0, threshold = 1) {
+    if (!this._legal(x, y)) return false;
+    if (!mask) return true;
+    if (!threshold) return true;
+    const chunks = this._getChunks(x, y, distance);
+    let total = 0;
+    for (let chunk of chunks) {
+      for (let tile of mask) {
+        total += chunk[tile];
+        if (total > threshold) return true;
+      }
+    }
+    return false;
+  }
+
+  _getChunks(x, y, distance) {
+    const cxMin = Math.max(0, Math.floor((x - distance) / CHUNK_SIZE));
+    const cyMin = Math.max(0, Math.floor((y - distance) / CHUNK_SIZE));
+    const cxMax = Math.min(
+      this.chunks[0].length - 1,
+      Math.floor((x + distance) / CHUNK_SIZE),
+    );
+    const cyMax = Math.min(
+      this.chunks.length - 1,
+      Math.floor((y + distance) / CHUNK_SIZE),
+    );
+
+    let matches = [];
+    for (let cx = cxMin; cx <= cxMax; cx++) {
+      for (let cy = cyMin; cy <= cyMax; cy++) {
+        matches.push(this.chunks[cy][cx]);
+      }
+    }
+    return matches;
+  }
+
+  _updateChunks() {
+    const me = this;
+    this.chunks = [];
+
+    for (let b = 0; b < this.rows / CHUNK_SIZE; b++) {
+      this.chunks.push([]);
+      for (let a = 0; a < this.rows / CHUNK_SIZE; a++) {
+        // Create chunk with zeroed counts for all tile types
+        let blankChunk = {};
+        for (let tile of Object.keys(TILESET)) {
+          blankChunk[tile] = 0;
+        }
+        this.chunks[b].push(blankChunk);
+
+        // Count tiles in chunk
+        const b0 = b * CHUNK_SIZE;
+        const a0 = a * CHUNK_SIZE;
+        this.forEachTile(
+          a0,
+          b0,
+          a0 + CHUNK_SIZE,
+          b0 + CHUNK_SIZE,
+          function (x, y) {
+            me.chunks[b][a][me.getTile(x, y)]++;
+          },
+        );
+      }
+    }
   }
 
   swapTiles(x, y, a, b, mask = false) {

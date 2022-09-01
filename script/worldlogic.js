@@ -132,13 +132,13 @@ class Worldlogic {
 
     if (Math.random() <= QUEEN_SPEED) {
       // when few fungus nearby, move randomly
-      if (this._touching(x, y, "FUNGUS", QUEEN_RANGE) < QUEEN_FUNGUS_MIN) {
+      if (this._touching(x, y, ["FUNGUS"], QUEEN_RANGE) < QUEEN_FUNGUS_MIN) {
         return this._moveRandom(x, y, WALK_MASK);
       }
       // when touching fungus, converts one to egg, else move any direction towards closest fungus
       return (
         this._setOneTouching(x, y, "EGG", ["FUNGUS"]) ||
-        this._searchForTile(x, y, "FUNGUS", QUEEN_RANGE, WALK_MASK) ||
+        this._searchForTile(x, y, ["FUNGUS"], QUEEN_RANGE, WALK_MASK) ||
         this._moveRandom(x, y, WALK_MASK) // unreachable target
       );
     }
@@ -273,6 +273,10 @@ class Worldlogic {
   }
 
   _touchingWhich(x, y, mask, radius = 1) {
+    // If no chunks in range contain target, skip searching
+    const threshold = this.world.checkTile(x, y, mask) ? 2 : 1;
+    if (!this.world.checkChunks(x, y, mask, radius, threshold)) return [];
+
     const world = this.world;
     const touching = [];
     this.world.forEachTile(
@@ -297,7 +301,10 @@ class Worldlogic {
     return false;
   }
 
-  _searchForTile(x, y, tile, radius, walkableMask = ["AIR"]) {
+  _searchForTile(x, y, targetMask, radius, walkableMask = ["AIR"]) {
+    // If no chunks in range contain target, skip searching
+    if (!this.world.checkChunks(x, y, targetMask, radius)) return false;
+
     for (let r = 1; r <= radius; r++) {
       for (let dx = -r; dx <= r; dx++) {
         for (let dy = -r; dy <= r; dy++) {
@@ -306,7 +313,7 @@ class Worldlogic {
           const a = x + dx;
           const b = y + dy;
 
-          if (this.world.checkTile(a, b, tile)) {
+          if (this.world.checkTile(a, b, targetMask)) {
             // found
             const desiredX = x + Math.sign(dx);
             const desiredY = y + Math.sign(dy);

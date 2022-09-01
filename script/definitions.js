@@ -1,6 +1,6 @@
 let DEBUG = false;
 let BENCHMARK_TICKS = 100;
-let BENCHMARK_BATCHES = 1;
+let BENCHMARK_BATCHES = 10;
 let BENCHMARK_DENSITY = 0.05;
 
 const TPS = 30;
@@ -25,8 +25,10 @@ const TILESET = {
 // Tiles that can be overridden with the brush
 const PAINTABLE_MASK = ["AIR", "SOIL", "SAND"];
 
-const ROW_COUNT = 100;
-const COL_COUNT = 100;
+const ROW_COUNT = 100; // World width
+const COL_COUNT = 100; // World height
+const CHUNK_SIZE = 10; // Optimisation for faster searching, must be factor of ROW_COUNT and COL_COUNT
+
 const RAIN_FREQ = 2500; // How often (in game ticks) it rains
 const RAIN_TIME = 500; // How long (in game ticks) it rains for
 const PEST_FREQ = 100; // How often (in game ticks) a pest enters the map
