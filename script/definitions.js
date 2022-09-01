@@ -27,7 +27,7 @@ const PAINTABLE_MASK = ["AIR", "SOIL", "SAND"];
 
 const ROW_COUNT = 100; // World width
 const COL_COUNT = 100; // World height
-const CHUNK_SIZE = 10; // Optimisation for faster searching, must be factor of ROW_COUNT and COL_COUNT
+const CHUNK_SIZE = 20; // Optimisation for faster searching, must be factor of ROW_COUNT and COL_COUNT
 
 const RAIN_FREQ = 2500; // How often (in game ticks) it rains
 const RAIN_TIME = 500; // How long (in game ticks) it rains for
@@ -45,7 +45,7 @@ let QUEEN_SPEED = 0.1; // The queen will only act this proportion of ticks
 let QUEEN_RANGE = 20; // Search radius of queens
 let QUEEN_FUNGUS_MIN = 5; // Minimum fungus tiles in range for queen to feed
 let PEST_SEEK_PROB = 0.2; // Chance per tick for a pest to seek a target
-let PEST_RANGE = 15; // Search radius of pests
+let PEST_RANGE = 20; // Search radius of pests
 let WORKER_RANGE = 15; // Search radius of workers
 
 // Tiles ants can climb
