@@ -3,18 +3,30 @@ class Renderer {
     this.canvas = canvas;
     this.world = world;
     this.tileset = tileset;
-    this._ctx = canvas.getContext("2d");
+    this._ctx = canvas.getContext("2d", { alpha: false });
     this._cw = canvas.width / world.cols;
     this._ch = canvas.height / world.rows;
   }
 
   draw() {
+    let style = "AIR";
+
     /// loop through rows and columns
     for (let y = 0; y < this.world.rows; y++) {
       for (let x = 0; x < this.world.cols; x++) {
+        // Optimisation: only draw tile if changed
+        const tile = this.world.tiles[y][x];
+        if (this.oldTiles && this.oldTiles[y][x] === tile) {
+          continue;
+        }
+
+        // Optimisation: only change brush if needed
+        if (style !== tile) {
+          this._ctx.fillStyle = this.tileset[tile];
+          style = tile;
+        }
+
         // Draw tile
-        const tile = this.world.getTile(x, y);
-        this._ctx.fillStyle = this.tileset[tile];
         this._ctx.fillRect(
           x * this._cw,
           this.canvas.height - y * this._ch,
@@ -23,6 +35,8 @@ class Renderer {
         );
       }
     }
+
+    this.oldTiles = JSON.parse(JSON.stringify(this.world.tiles));
   }
 
   mapCoordinates(x, y) {
