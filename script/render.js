@@ -6,11 +6,10 @@ class Renderer {
     this._ctx = canvas.getContext("2d", { alpha: false });
     this._cw = canvas.width / world.cols;
     this._ch = canvas.height / world.rows;
+    this.fillStyle = "AIR";
   }
 
   draw() {
-    let style = "AIR";
-
     /// loop through rows and columns
     for (let y = 0; y < this.world.rows; y++) {
       for (let x = 0; x < this.world.cols; x++) {
@@ -21,9 +20,9 @@ class Renderer {
         }
 
         // Optimisation: only change brush if needed
-        if (style !== tile) {
-          this._ctx.fillStyle = this.tileset[tile];
-          style = tile;
+        if (this.fillStyle !== tile) {
+          this.fillStyle = tile;
+          this._ctx.fillStyle = this.tileset[this.fillStyle];
         }
 
         // Draw tile
