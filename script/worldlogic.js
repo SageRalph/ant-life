@@ -60,6 +60,13 @@ class Worldlogic {
   }
 
   _waterAction(x, y) {
+    if (
+      Math.random() <= KILL_PROB &&
+      this._setOneTouching(x, y, "CORPSE", WATER_KILL_MASK)
+    ) {
+      return this.world.setTile(x, y, "AIR");
+    }
+
     // chance to evaporate under sky or if air to left/right or near plant
     if (
       Math.random() <= EVAPORATE_PROB &&
@@ -120,11 +127,6 @@ class Worldlogic {
   }
 
   _queenAction(x, y) {
-    // Destroyed by water
-    if (Math.random() <= KILL_PROB * this._touching(x, y, ["WATER"])) {
-      return this.world.setTile(x, y, "CORPSE");
-    }
-
     // when unsupported on all sides, move down
     if (!this._climbable(x, y)) {
       return this.world.swapTiles(x, y, x, y - 1);
@@ -146,11 +148,6 @@ class Worldlogic {
   }
 
   _workerAction(x, y) {
-    // Destroyed by water
-    if (Math.random() <= KILL_PROB * this._touching(x, y, ["WATER"])) {
-      return this.world.setTile(x, y, "CORPSE");
-    }
-
     // when unsupported on all sides, move down
     if (!this._climbable(x, y)) {
       return this.world.swapTiles(x, y, x, y - 1);
@@ -161,11 +158,8 @@ class Worldlogic {
   }
 
   _pestAction(x, y) {
-    // Destroyed by water and workers
-    if (
-      Math.random() <=
-      KILL_PROB * this._touching(x, y, ["WATER", "WORKER"])
-    ) {
+    // Destroyed by workers
+    if (Math.random() <= KILL_PROB * this._touching(x, y, ["WORKER"])) {
       return this.world.setTile(x, y, "CORPSE");
     }
 
@@ -193,11 +187,6 @@ class Worldlogic {
   }
 
   _eggAction(x, y) {
-    // Destroyed by water
-    if (Math.random() <= KILL_PROB * this._touching(x, y, ["WATER"])) {
-      return this.world.setTile(x, y, "CORPSE");
-    }
-
     // chance to hatch, else move down or diagonally down
     if (Math.random() <= EGG_HATCH_PROB) {
       // hatch into QUEEN or WORKER

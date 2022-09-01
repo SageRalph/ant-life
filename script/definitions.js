@@ -36,7 +36,7 @@ const PEST_START = 4000; // How long (in game ticks) before pests can spawn
 
 // These are modifiable during run-time using the browser console
 let KILL_PROB = 0.01; // Chance per tick for each hazard to kill
-let EVAPORATE_PROB = 0.01; // Chance per tick for water to evaporate
+let EVAPORATE_PROB = 0.008; // Chance per tick for water to evaporate
 let CONVERT_PROB = 0.01; // Chance per tick for fungus/plant to convert
 let GROW_PROB = 0.1; // Base chance per tick for a lone plant tile to grow (reduced by crowding)
 let EGG_HATCH_PROB = 0.001; // Chance per tick for an egg to hatch
@@ -70,3 +70,6 @@ const PLANT_GROW_MASK = ["AIR", "WATER", "CORPSE", "TRAIL"];
 
 // Tiles pests will seek to kill
 const PEST_TARGET_MASK = ["EGG", "QUEEN", "WORKER"];
+
+// Tiles water will kill
+const WATER_KILL_MASK = ["WORKER", "QUEEN", "EGG", "PEST"];
