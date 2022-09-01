@@ -32,7 +32,7 @@ const EGG_HATCH_PROB = 0.001; // Chance per tick for an egg to hatch
 const EGG_QUEEN_PROB = 0.01; // Chance for a hatching egg to be a queen
 const QUEEN_SPEED = 0.1; // The queen will only act this proportion of ticks
 const QUEEN_RANGE = 20; // Search radius of queens
-const PEST_RANGE = 20; // Search radius of pests
+const PEST_RANGE = 15; // Search radius of pests
 
 // Tiles ants can climb
 const CLIMB_MASK = ["SOIL", "SAND", "STONE", "FUNGUS", "CORPSE", "ANT", "EGG"];
