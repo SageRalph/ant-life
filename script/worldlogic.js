@@ -130,13 +130,17 @@ class Worldlogic {
       return this.world.setTile(x, y, "CORPSE");
     }
 
-    // TODO - workers currently just move randomly
+    if (
+      this.world.checkTile(x, y - 1, "AIR") &&
+      this._touching(x, y, CLIMB_MASK) === 0
+    ) {
+      return this.world.swapTiles(x, y, x, y - 1);
+    }
+
+    // move randomly
     const dx = randomIntInclusive(-1, 1);
     const dy = randomIntInclusive(-1, 1);
-    return (
-      (dy < 1 || this._touching(x + dx, y + dy, CLIMB_MASK) > 1) &&
-      this.world.swapTiles(x, y, x + dx, y + dy, WALK_MASK)
-    );
+    return this.world.swapTiles(x, y, x + dx, y + dy, WALK_MASK);
   }
 
   _pestAction(x, y) {
