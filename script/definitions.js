@@ -43,7 +43,7 @@ let QUEEN_SPEED = 0.1; // The queen will only act this proportion of ticks
 let QUEEN_RANGE = 20; // Search radius of queens
 let QUEEN_FUNGUS_MIN = 5; // Minimum fungus tiles in range for queen to feed
 let PEST_SEEK_PROB = 0.2; // Chance per tick for a pest to seek a target
-let PEST_RANGE = 20; // Search radius of pests
+let PEST_RANGE = 15; // Search radius of pests
 let WORKER_RANGE = 15; // Search radius of workers
 
 // Tiles ants can climb
