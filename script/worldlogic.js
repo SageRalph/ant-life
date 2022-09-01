@@ -218,10 +218,7 @@ class Worldlogic {
   }
 
   _trailAction(x, y) {
-    // Instantly destroyed on contact with anything that moves
-    if (this._touching(x, y, ["AIR", "TRAIL"]) < 8) {
-      return this.world.setTile(x, y, "AIR");
-    }
+    let result = false;
 
     // when unsupported on all sides, move down but don't stack
     if (!this._climbable(x, y)) {
@@ -234,18 +231,32 @@ class Worldlogic {
 
     // find a worker to draw
     const targets = this._touchingWhich(x, y, ["WORKER"], WORKER_RANGE);
-    if (!targets.length) return false;
-    const { a, b } = targets[randomIntInclusive(0, targets.length - 1)];
+    if (!targets.length) {
+      result = false;
+    } else {
+      // choose one at random
+      const { a, b } = targets[randomIntInclusive(0, targets.length - 1)];
 
-    // move worker towards if possible
-    const desiredA = a + Math.sign(x - a);
-    const desiredB = b + Math.sign(y - b);
-    return (
-      this._climbable(a, b) &&
-      (this.world.swapTiles(a, b, desiredA, desiredB, WALK_MASK) ||
-        this.world.swapTiles(a, b, a, desiredB, WALK_MASK) ||
-        this.world.swapTiles(a, b, desiredA, b, WALK_MASK))
-    );
+      // move worker towards if possible
+      const desiredA = a + Math.sign(x - a);
+      const desiredB = b + Math.sign(y - b);
+      result =
+        this._climbable(a, b) &&
+        (this.world.swapTiles(a, b, desiredA, desiredB, WALK_MASK) ||
+          this.world.swapTiles(a, b, a, desiredB, WALK_MASK) ||
+          this.world.swapTiles(a, b, desiredA, b, WALK_MASK));
+    }
+
+    // Instantly destroyed on contact with anything that moves
+    // Note: this is done after drawing workers so it works when touching a surface
+    // however, this means we have to check that its not been consumed yet
+    if (
+      this.world.checkTile(x, y, ["TRAIL"]) && // check not consumed
+      this._touching(x, y, ["AIR", "TRAIL"]) < 8
+    ) {
+      return this.world.setTile(x, y, "AIR");
+    }
+    return result;
   }
 
   _climbable(x, y) {
