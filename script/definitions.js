@@ -32,18 +32,19 @@ const RAIN_TIME = 500; // How long (in game ticks) it rains for
 const PEST_FREQ = 100; // How often (in game ticks) a pest enters the map
 const PEST_START = 4000; // How long (in game ticks) before pests can spawn
 
-const KILL_PROB = 0.01; // Chance per tick for each hazard to kill
-const EVAPORATE_PROB = 0.01; // Chance per tick for water to evaporate
-const CONVERT_PROB = 0.01; // Chance per tick for fungus/plant to convert
-const GROW_PROB = 0.1; // Base chance per tick for a lone plant tile to grow (reduced by crowding)
-const EGG_HATCH_PROB = 0.001; // Chance per tick for an egg to hatch
-const EGG_QUEEN_PROB = 0.01; // Chance for a hatching egg to be a queen
-const QUEEN_SPEED = 0.1; // The queen will only act this proportion of ticks
-const QUEEN_RANGE = 20; // Search radius of queens
-const QUEEN_FUNGUS_MIN = 5; // Minimum fungus tiles in range for queen to feed
-const PEST_SEEK_PROB = 0.2; // Chance per tick for a pest to seek a target
-const PEST_RANGE = 20; // Search radius of pests
-const WORKER_RANGE = 15; // Search radius of workers
+// These are modifiable during run-time using the browser console
+let KILL_PROB = 0.01; // Chance per tick for each hazard to kill
+let EVAPORATE_PROB = 0.01; // Chance per tick for water to evaporate
+let CONVERT_PROB = 0.01; // Chance per tick for fungus/plant to convert
+let GROW_PROB = 0.1; // Base chance per tick for a lone plant tile to grow (reduced by crowding)
+let EGG_HATCH_PROB = 0.001; // Chance per tick for an egg to hatch
+let EGG_QUEEN_PROB = 0.01; // Chance for a hatching egg to be a queen
+let QUEEN_SPEED = 0.1; // The queen will only act this proportion of ticks
+let QUEEN_RANGE = 20; // Search radius of queens
+let QUEEN_FUNGUS_MIN = 5; // Minimum fungus tiles in range for queen to feed
+let PEST_SEEK_PROB = 0.2; // Chance per tick for a pest to seek a target
+let PEST_RANGE = 20; // Search radius of pests
+let WORKER_RANGE = 15; // Search radius of workers
 
 // Tiles ants can climb
 const CLIMB_MASK = [
