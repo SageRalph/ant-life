@@ -1,22 +1,3 @@
-const ROW_COUNT = 100;
-const COL_COUNT = 100;
-const TILESET = {
-  AIR: "skyblue",
-  SOIL: "peru",
-  SAND: "sandybrown",
-  STONE: "slategray",
-  ANT: "red",
-  QUEEN: "blueviolet",
-  EGG: "white",
-  CORPSE: "black",
-  PLANT: "olivedrab",
-  WATER: "blue",
-  FUNGUS: "teal",
-  PEST: "fuchsia",
-};
-const START_PAUSED = false;
-let DEBUG = false;
-
 let FRAME_TIMER;
 let LAST_FRAME_TIME = performance.now();
 let FPS_TIME = 0;
@@ -83,7 +64,7 @@ function _setPointerLocation(e) {
 function init() {
   if (DEBUG) console.log("Loading...");
   $("#score").text("");
-  WORLD = new World(ROW_COUNT, COL_COUNT);
+  WORLD = new World();
   RENDERER = new Renderer(document.getElementById("map"), WORLD, TILESET);
   RENDERER.draw();
   prompt(`
@@ -111,22 +92,22 @@ function gameLoop(loop = true) {
   }
   LAST_ANT_COUNT = WORLD.ants;
 
-  if (WORLD.age === 2000) {
+  if (WORLD.age === RAIN_FREQ - 500) {
     prompt(`
       The spring rains will start soon, prepare for the flood! <br/>
       Water (blue) kills workers (red), queens (purple), and eggs (white)
     `);
-  } else if (WORLD.age === 3000) {
+  } else if (WORLD.age === RAIN_FREQ + RAIN_TIME) {
     prompt(`
     The rains have stopped for now, but will return regularly <br/>
     Water (blue) evaporates in the sun and is absorbed by plants (green)
   `);
-  } else if (WORLD.age === 3500) {
+  } else if (WORLD.age === PEST_START - 500) {
     prompt(`
     Pests (pink) will soon be attracted by the new growth <br/>
     Pests will hunt for eggs (white) but workers (red) will fight back
   `);
-  } else if (WORLD.age === 4300) {
+  } else if (WORLD.age === PEST_START + 500) {
     prompt(`
     Stay on guard for more pests and rainfall <br/>
     Protect the queen and grow the colony by farming fungus

@@ -1,27 +1,5 @@
-const RAIN_FREQ = 2500; // How often (in game ticks) it rains
-const RAIN_TIME = 500; // How long (in game ticks) it rains for
-const PEST_FREQ = 100; // How often (in game ticks) a pest enters the map
-const PEST_START = 4000; // How long (in game ticks) before pests can spawn
-
-// Tiles ants can climb
-const ANT_CLIMB_MASK = [
-  "SOIL",
-  "SAND",
-  "STONE",
-  "FUNGUS",
-  "CORPSE",
-  "ANT",
-  "EGG",
-];
-
-// Tiles ants can move through
-const ANT_WALK_MASK = ["AIR", "CORPSE", "EGG", "PLANT", "FUNGUS"];
-
-// Tiles pests can move through
-const PEST_WALK_MASK = ["AIR", "CORPSE", "FUNGUS"];
-
 class World {
-  constructor(rows, cols, generatorSettings = {}) {
+  constructor(rows = ROW_COUNT, cols = COL_COUNT, generatorSettings = {}) {
     this.rows = rows;
     this.cols = cols;
     this.age = 0;
