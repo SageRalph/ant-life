@@ -38,7 +38,8 @@ const EGG_QUEEN_PROB = 0.01; // Chance for a hatching egg to be a queen
 const QUEEN_SPEED = 0.1; // The queen will only act this proportion of ticks
 const QUEEN_RANGE = 20; // Search radius of queens
 const QUEEN_FUNGUS_MIN = 5; // Minimum fungus tiles in range for queen to feed
-const PEST_RANGE = 15; // Search radius of pests
+const PEST_SEEK_PROB = 0.2; // Chance per tick for a pest to seek a target
+const PEST_RANGE = 20; // Search radius of pests
 const WORKER_RANGE = 15; // Search radius of workers
 
 // Tiles ants can climb

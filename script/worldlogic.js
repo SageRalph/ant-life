@@ -165,20 +165,22 @@ class Worldlogic {
     // Pests are hit by all neighbouring workers but only hit one worker per tick.
     // But pests have a higher base attack chance so typically win 1 on 1.
     if (Math.random() <= KILL_PROB * 2) {
-      if (this._setOneTouching(x, y, "CORPSE", ["WORKER", "EGG", "QUEEN"])) {
+      if (this._setOneTouching(x, y, "CORPSE", PEST_TARGET_MASK)) {
         return true;
       }
     }
 
-    // Seek out eggs
-    if (this._searchForTile(x, y, PEST_TARGET_MASK, PEST_RANGE, WALK_MASK)) {
+    // Chance to seek out targets
+    // Note: low chance allows going around obstacles and also reduces lag
+    if (
+      Math.random() < PEST_SEEK_PROB &&
+      this._searchForTile(x, y, PEST_TARGET_MASK, PEST_RANGE, WALK_MASK)
+    ) {
       return true;
     }
     // move randomly
     // Note: random movement uses a reduced tileset to avoid helping farm
-    let dx = randomIntInclusive(-1, 1);
-    let dy = randomIntInclusive(-1, 1);
-    return this.world.swapTiles(x, y, x + dx, y + dy, ROAM_MASK);
+    return this._moveRandom(x, y, ROAM_MASK);
   }
 
   _eggAction(x, y) {
