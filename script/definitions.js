@@ -1,5 +1,6 @@
 let DEBUG = false;
 
+const TPS = 30;
 const START_PAUSED = false;
 
 const TILESET = {

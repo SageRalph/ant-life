@@ -1,5 +1,6 @@
 let FRAME_TIMER;
 let LAST_FRAME_TIME = performance.now();
+let LAST_TICK_TIME = performance.now();
 let FPS_TIME = 0;
 let WORLD;
 let RENDERER;
@@ -88,8 +89,13 @@ function init() {
 function gameLoop(loop = true) {
   const start = performance.now();
 
+  // world tick rate can be <= frame rate
+  if (start - LAST_TICK_TIME >= 1000 / TPS) {
+    LAST_TICK_TIME = performance.now();
+    WORLD.tick();
+  }
+
   doInput(false);
-  WORLD.tick();
   RENDERER.draw();
 
   if (LAST_ANT_COUNT === 1 && WORLD.ants > 1) {
@@ -133,14 +139,12 @@ function gameLoop(loop = true) {
   if (loop) {
     // Calculate FPS
     const thisFrameTime = (thisLoop = performance.now()) - LAST_FRAME_TIME;
-    FPS_TIME += (thisFrameTime - FPS_TIME) / 5;
+    FPS_TIME += (thisFrameTime - FPS_TIME) / 20;
     LAST_FRAME_TIME = thisLoop;
     $("#fps").text(`${Math.round(1000 / FPS_TIME)} FPS`);
 
-    // Request every-other v-blank
-    FRAME_TIMER = requestAnimationFrame(() => {
-      FRAME_TIMER = requestAnimationFrame(gameLoop);
-    });
+    // Request every v-blank
+    FRAME_TIMER = requestAnimationFrame(gameLoop);
   }
 }
 
