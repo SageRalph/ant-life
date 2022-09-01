@@ -3,7 +3,16 @@ class Worldlogic {
     this.world = world;
   }
 
-  doTileAction(x, y) {
+  tick() {
+    this.world.age += 1;
+    for (let y = 0; y < this.world.rows; y++) {
+      for (let x = 0; x < this.world.cols; x++) {
+        this._doTileAction(x, y);
+      }
+    }
+  }
+
+  _doTileAction(x, y) {
     const actions = {
       SAND: this._sandAction,
       CORPSE: this._corpseAction,

@@ -11,14 +11,8 @@ class World {
   }
 
   tick() {
-    this.age += 1;
-
     // Tile actions
-    for (let y = 0; y < this.rows; y++) {
-      for (let x = 0; x < this.cols; x++) {
-        this.worldlogic.doTileAction(x, y);
-      }
-    }
+    this.worldlogic.tick();
 
     // Rain
     if (this.age >= RAIN_FREQ && this.age % RAIN_FREQ <= RAIN_TIME) {
