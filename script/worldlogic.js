@@ -115,11 +115,22 @@ class Worldlogic {
     if (Math.random() <= KILL_PROB * this._touching(x, y, ["WATER"])) {
       return this.world.setTile(x, y, "CORPSE");
     }
-    // when touching fungus, converts one to egg, else move any direction towards closest fungus
+
+    // when unsupported on all sides, move down
+    if (!this._climbable(x, y)) {
+      return this.world.swapTiles(x, y, x, y - 1);
+    }
+
     if (Math.random() <= QUEEN_SPEED) {
+      // when few fungus nearby, move randomly
+      if (this._touching(x, y, "FUNGUS", QUEEN_RANGE) < QUEEN_FUNGUS_MIN) {
+        return this._moveRandom(x, y, WALK_MASK);
+      }
+      // when touching fungus, converts one to egg, else move any direction towards closest fungus
       return (
         this._setOneTouching(x, y, "EGG", ["FUNGUS"]) ||
-        this._searchForTile(x, y, "FUNGUS", QUEEN_RANGE, WALK_MASK)
+        this._searchForTile(x, y, "FUNGUS", QUEEN_RANGE, WALK_MASK) ||
+        this._moveRandom(x, y, WALK_MASK) // unreachable target
       );
     }
     return false;
@@ -137,9 +148,7 @@ class Worldlogic {
     }
 
     // move randomly
-    const dx = randomIntInclusive(-1, 1);
-    const dy = randomIntInclusive(-1, 1);
-    return this.world.swapTiles(x, y, x + dx, y + dy, WALK_MASK);
+    return this._moveRandom(x, y, WALK_MASK);
   }
 
   _pestAction(x, y) {
@@ -233,6 +242,12 @@ class Worldlogic {
       !this.world.checkTile(x, y - 1, ["AIR", "TRAIL"]) ||
       this._touching(x, y, CLIMB_MASK) > 0
     );
+  }
+
+  _moveRandom(x, y, mask) {
+    const dx = randomIntInclusive(-1, 1);
+    const dy = randomIntInclusive(-1, 1);
+    return this.world.swapTiles(x, y, x + dx, y + dy, mask);
   }
 
   _exposedToSky(x, y) {
