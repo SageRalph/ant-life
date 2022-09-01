@@ -18,6 +18,9 @@ const TILESET = {
   TRAIL: "yellow",
 };
 
+// Tiles that can be overridden with the brush
+const PAINTABLE_MASK = ["AIR", "SOIL", "SAND"];
+
 const ROW_COUNT = 100;
 const COL_COUNT = 100;
 const RAIN_FREQ = 2500; // How often (in game ticks) it rains

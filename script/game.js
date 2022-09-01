@@ -4,6 +4,7 @@ let FPS_TIME = 0;
 let WORLD;
 let RENDERER;
 let BRUSH_ON = false;
+let BRUSH_MASK = "AIR";
 let BRUSH_X;
 let BRUSH_Y;
 let LAST_ANT_COUNT = 1;
@@ -43,6 +44,7 @@ function setupControls() {
 
   $("#map").on("pointerdown", function (e) {
     _setPointerLocation(e);
+    _setBrushMask();
     BRUSH_ON = true;
     doInput();
   });
@@ -59,6 +61,15 @@ function _setPointerLocation(e) {
   const { x, y } = RENDERER.mapCoordinates(e.clientX, e.clientY);
   BRUSH_X = x;
   BRUSH_Y = y;
+}
+
+function _setBrushMask() {
+  const tile = WORLD.getTile(BRUSH_X, BRUSH_Y);
+  if (PAINTABLE_MASK.includes(tile)) {
+    BRUSH_MASK = tile;
+  } else {
+    BRUSH_MASK = "AIR";
+  }
 }
 
 function init() {
@@ -137,11 +148,7 @@ function doInput(draw = true) {
   if (!BRUSH_ON) return;
   const brushSize = Math.round($("#brush-size").val());
   const brushMat = $("#brush-mat").val();
-  WORLD.fillCircle(BRUSH_X, BRUSH_Y, brushSize, brushMat, [
-    "AIR",
-    "SOIL",
-    "SAND",
-  ]);
+  WORLD.fillCircle(BRUSH_X, BRUSH_Y, brushSize, brushMat, BRUSH_MASK);
   if (draw) RENDERER.draw();
 }
 
