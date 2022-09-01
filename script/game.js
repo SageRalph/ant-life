@@ -91,8 +91,13 @@ function gameLoop(loop = true) {
 
   // world tick rate can be <= frame rate
   if (start - LAST_TICK_TIME >= 1000 / TPS) {
-    LAST_TICK_TIME = performance.now();
+    LAST_TICK_TIME = start;
     WORLD.tick();
+
+    if (DEBUG) {
+      const elapsed = performance.now() - start;
+      console.log(`Tick ${WORLD.age} completed in ${elapsed}ms`);
+    }
   }
 
   doInput(false);
@@ -129,11 +134,6 @@ function gameLoop(loop = true) {
     Stay on guard for more pests and rainfall <br/>
     Protect the queen and grow the colony by farming fungus
   `);
-  }
-
-  if (DEBUG) {
-    const elapsed = performance.now() - start;
-    console.log(`Tick ${WORLD.age} completed in ${elapsed}ms`);
   }
 
   if (loop) {
