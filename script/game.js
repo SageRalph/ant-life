@@ -18,20 +18,50 @@ $(document).ready(function () {
   }
 });
 
+/**
+ * Benchmark simulation performance
+ */
+function benchmark() {
+  return new World().benchmark();
+}
+
+/**
+ * Pause the simulation
+ */
+function pause() {
+  if (FRAME_TIMER) {
+    cancelAnimationFrame(FRAME_TIMER);
+    FRAME_TIMER = null;
+  }
+  $("#btn-pause").text("Play");
+}
+
+/**
+ * Run the simulation
+ */
+function play() {
+  $("#btn-pause").text("Pause");
+  gameLoop();
+}
+
+/**
+ * Run simulation for a single step
+ */
+function step() {
+  gameLoop(false);
+}
+
 function setupControls() {
   $("#btn-pause").on("click", function () {
     if (FRAME_TIMER) {
-      cancelAnimationFrame(FRAME_TIMER);
-      FRAME_TIMER = null;
-      $(this).text("Play");
+      pause();
     } else {
-      $(this).text("Pause");
-      gameLoop();
+      play();
     }
   });
 
   $("#btn-tick").on("click", function () {
-    gameLoop(false);
+    step();
   });
 
   $("#btn-reset").on("click", function () {

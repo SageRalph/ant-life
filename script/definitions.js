@@ -1,4 +1,7 @@
 let DEBUG = false;
+let BENCHMARK_TICKS = 100;
+let BENCHMARK_BATCHES = 1;
+let BENCHMARK_DENSITY = 0.05;
 
 const TPS = 30;
 const START_PAUSED = false;

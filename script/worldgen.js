@@ -3,6 +3,22 @@ class Worldgen {
     this.world = world;
   }
 
+  generateBenchmarkWorld(mask = Object.keys(TILESET)) {
+    this.world.age = 0;
+
+    // World containing random tiles
+    this.world.tiles = [];
+    for (let y = 0; y < this.world.rows; y++) {
+      let row = [];
+      for (let x = 0; x < this.world.cols; x++) {
+        // Random tile from mask
+        let tile = mask[randomIntInclusive(0, mask.length - 1)];
+        row.push(tile);
+      }
+      this.world.tiles.push(row);
+    }
+  }
+
   generate({
     skyProp = 0.2,
     startingAge = 100,
@@ -27,6 +43,8 @@ class Worldgen {
     noiseMinSize = 4,
     noiseMaxSize = 6,
   }) {
+    this.world.age = 0;
+
     const surfaceY = Math.round(this.world.rows * (1 - skyProp));
     this.world.surfaceY = surfaceY;
     const midX = Math.round(this.world.cols / 2);

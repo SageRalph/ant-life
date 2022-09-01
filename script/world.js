@@ -110,4 +110,50 @@ class World {
   _legal(x, y) {
     return x >= 0 && y >= 0 && x < this.cols && y < this.rows;
   }
+
+  benchmark() {
+    const durations = {};
+    const allTiles = Object.keys(TILESET);
+
+    // mixed tilesets
+    durations["all"] = this._doBenchmark(allTiles, "all");
+    durations["creatures"] = this._doBenchmark(
+      ["PEST", "WORKER", "EGG", "QUEEN", "AIR"],
+      "creatures",
+    );
+
+    // Each tile
+    for (let tile of allTiles) {
+      let mask = [tile];
+      // Pad mask with AIR for more realistic behaviour and smoother performance
+      for (let i = 0; i < 1 / BENCHMARK_DENSITY - 1; i++) {
+        mask.push("AIR");
+      }
+      durations[tile] = this._doBenchmark(mask, tile);
+    }
+
+    const sorted = Object.fromEntries(
+      Object.entries(durations).sort(([, a], [, b]) => a - b),
+    );
+    const result = JSON.stringify(sorted, null, 2);
+
+    console.log(
+      `Benchmarked TPS over ${BENCHMARK_BATCHES} runs of ${BENCHMARK_TICKS} ticks at density ${BENCHMARK_DENSITY}\n${result}`,
+    );
+    return sorted;
+  }
+
+  _doBenchmark(mask, name) {
+    console.log("Benchmarking", name);
+    const batches = [];
+    for (let batch = 0; batch < BENCHMARK_BATCHES; batch++) {
+      this.worldgen.generateBenchmarkWorld(mask);
+      const start = performance.now();
+      for (let i = 0; i < BENCHMARK_TICKS; i++) {
+        this.worldlogic.tick();
+      }
+      batches.push((performance.now() - start) / BENCHMARK_TICKS);
+    }
+    return Math.round(1000 / average(batches));
+  }
 }

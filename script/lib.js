@@ -12,3 +12,7 @@ function randomIntInclusive(min, max) {
 function randomSign() {
   return Math.random() < 0.5 ? 1 : -1;
 }
+
+function average(arr) {
+  return arr.reduce((p, c) => p + c, 0) / arr.length;
+}
