@@ -58,19 +58,21 @@
         <label>
           <span>Brush</span>
           <select id="brush-mat">
-            <option>AIR</option>
-            <option>SOIL</option>
-            <option>SAND</option>
+            <optgroup label="Materials">
+              <option>AIR</option>
+              <option>SOIL</option>
+              <option>SAND</option>
+            </optgroup>
             <optgroup label="God Mode">
-              <option>WATER</option>
               <option>STONE</option>
+              <option>WATER</option>
+              <option>PEST</option>
               <option>PLANT</option>
               <option>FUNGUS</option>
-              <option>ANT</option>
-              <option>EGG</option>
+              <option>WORKER</option>
               <option>QUEEN</option>
+              <option>EGG</option>
               <option>CORPSE</option>
-              <option>PEST</option>
             </optgroup>
           </select>
         </label>
@@ -91,16 +93,6 @@
         <summary>Tile Guide</summary>
         <table>
           <tr>
-            <th style="color: blue">Blue</th>
-            <th>Water</th>
-            <td>Dangerous to Workers, Queens, Eggs, and Pests</td>
-          </tr>
-          <tr>
-            <th style="color: fuchsia">Pink</th>
-            <th>Pest</th>
-            <td>Hunts for Eggs, but Workers can fight them</td>
-          </tr>
-          <tr>
             <th style="color: peru">Brown</th>
             <th>Soil</th>
             <td>Basic building material</td>
@@ -114,6 +106,11 @@
             <th style="color: slategray">Grey</th>
             <th>Stone</th>
             <td>Can't be moved</td>
+          </tr>
+          <tr>
+            <th style="color: blue">Blue</th>
+            <th>Water</th>
+            <td>Dangerous to Workers, Queens, Eggs, and Pests</td>
           </tr>
           <tr>
             <th style="color: olivedrab">Green</th>
@@ -144,6 +141,11 @@
             <th style="color: black">Black</th>
             <th>Debris</th>
             <td>Various dead things, good fertiliser for Plants</td>
+          </tr>
+          <tr>
+            <th style="color: fuchsia">Pink</th>
+            <th>Pest</th>
+            <td>Hunts for Eggs, but Workers can fight them</td>
           </tr>
         </table>
       </details>

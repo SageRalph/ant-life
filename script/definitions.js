@@ -7,7 +7,7 @@ const TILESET = {
   SOIL: "peru",
   SAND: "sandybrown",
   STONE: "slategray",
-  ANT: "red",
+  WORKER: "red",
   QUEEN: "blueviolet",
   EGG: "white",
   CORPSE: "black",
@@ -35,7 +35,7 @@ const QUEEN_RANGE = 20; // Search radius of queens
 const PEST_RANGE = 15; // Search radius of pests
 
 // Tiles ants can climb
-const CLIMB_MASK = ["SOIL", "SAND", "STONE", "FUNGUS", "CORPSE", "ANT", "EGG"];
+const CLIMB_MASK = ["SOIL", "SAND", "STONE", "FUNGUS", "CORPSE", "WORKER", "EGG"];
 
 // Tiles ants can move through (also used by pests when hunting)
 const WALK_MASK = ["AIR", "CORPSE", "EGG", "PLANT", "FUNGUS"];
@@ -47,4 +47,4 @@ const ROAM_MASK = ["AIR", "CORPSE", "FUNGUS"];
 const PLANT_GROW_MASK = ["AIR", "WATER", "CORPSE"];
 
 // Tiles pests will seek to kill
-const PEST_TARGET_MASK = ["EGG", "QUEEN", "ANT"];
+const PEST_TARGET_MASK = ["EGG", "QUEEN", "WORKER"];

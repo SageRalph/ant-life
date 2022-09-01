@@ -11,7 +11,7 @@ class Worldlogic {
       PLANT: this._plantAction,
       FUNGUS: this._fungusAction,
       QUEEN: this._queenAction,
-      ANT: this._antAction,
+      WORKER: this._workerAction,
       PEST: this._pestAction,
       EGG: this._eggAction,
     };
@@ -124,13 +124,13 @@ class Worldlogic {
     return false;
   }
 
-  _antAction(x, y) {
+  _workerAction(x, y) {
     // Destroyed by water
     if (Math.random() <= KILL_PROB * this._touching(x, y, ["WATER"])) {
       return this.world.setTile(x, y, "CORPSE");
     }
 
-    // TODO - ants currently just move randomly
+    // TODO - workers currently just move randomly
     const dx = randomIntInclusive(-1, 1);
     const dy = randomIntInclusive(-1, 1);
     return (
@@ -140,17 +140,20 @@ class Worldlogic {
   }
 
   _pestAction(x, y) {
-    // Destroyed by water and ants
-    if (Math.random() <= KILL_PROB * this._touching(x, y, ["WATER", "ANT"])) {
+    // Destroyed by water and workers
+    if (
+      Math.random() <=
+      KILL_PROB * this._touching(x, y, ["WATER", "WORKER"])
+    ) {
       return this.world.setTile(x, y, "CORPSE");
     }
 
-    // Fight ants, queens, eggs
-    // Note: this is asymmetric so groups of ants fight better than pests.
-    // Pests are hit by all neighbouring ants but only hit one ant per tick.
+    // Fight workers, queens, eggs
+    // Note: this is asymmetric so groups of workers fight better than pests.
+    // Pests are hit by all neighbouring workers but only hit one worker per tick.
     // But pests have a higher base attack chance so typically win 1 on 1.
     if (Math.random() <= KILL_PROB * 2) {
-      if (this._setOneTouching(x, y, "CORPSE", ["ANT", "EGG", "QUEEN"])) {
+      if (this._setOneTouching(x, y, "CORPSE", ["WORKER", "EGG", "QUEEN"])) {
         return true;
       }
     }
@@ -172,13 +175,13 @@ class Worldlogic {
       return this.world.setTile(x, y, "CORPSE");
     }
 
-    // chance to convert to ant, else move down or diagonally down
+    // chance to hatch, else move down or diagonally down
     if (Math.random() <= EGG_HATCH_PROB) {
-      // hatch into QUEEN or ANT
+      // hatch into QUEEN or WORKER
       this.world.setTile(
         x,
         y,
-        Math.random() < EGG_QUEEN_PROB ? "QUEEN" : "ANT",
+        Math.random() < EGG_QUEEN_PROB ? "QUEEN" : "WORKER",
       );
       this.world.ants++;
       return true;
