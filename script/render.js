@@ -33,7 +33,7 @@ class Renderer {
     const cy = (y - rect.top) * scaleY;
     return {
       x: Math.floor(cx / this._cw),
-      y: this.world.rows - Math.floor(cy / this._ch),
+      y: this.world.rows - Math.ceil(cy / this._ch),
     };
   }
 }
