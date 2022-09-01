@@ -15,6 +15,7 @@ const TILESET = {
   WATER: "blue",
   FUNGUS: "teal",
   PEST: "fuchsia",
+  TRAIL: "yellow",
 };
 
 const ROW_COUNT = 100;
@@ -33,18 +34,27 @@ const EGG_QUEEN_PROB = 0.01; // Chance for a hatching egg to be a queen
 const QUEEN_SPEED = 0.1; // The queen will only act this proportion of ticks
 const QUEEN_RANGE = 20; // Search radius of queens
 const PEST_RANGE = 15; // Search radius of pests
+const WORKER_RANGE = 15; // Search radius of workers
 
 // Tiles ants can climb
-const CLIMB_MASK = ["SOIL", "SAND", "STONE", "FUNGUS", "CORPSE", "WORKER", "EGG"];
+const CLIMB_MASK = [
+  "SOIL",
+  "SAND",
+  "STONE",
+  "FUNGUS",
+  "CORPSE",
+  "WORKER",
+  "EGG",
+];
 
 // Tiles ants can move through (also used by pests when hunting)
-const WALK_MASK = ["AIR", "CORPSE", "EGG", "PLANT", "FUNGUS"];
+const WALK_MASK = ["AIR", "CORPSE", "EGG", "PLANT", "FUNGUS", "TRAIL"];
 
 // Tiles pests can move through when wandering
-const ROAM_MASK = ["AIR", "CORPSE", "FUNGUS"];
+const ROAM_MASK = ["AIR", "CORPSE", "FUNGUS", "TRAIL"];
 
 // Tiles plants can grow into
-const PLANT_GROW_MASK = ["AIR", "WATER", "CORPSE"];
+const PLANT_GROW_MASK = ["AIR", "WATER", "CORPSE", "TRAIL"];
 
 // Tiles pests will seek to kill
 const PEST_TARGET_MASK = ["EGG", "QUEEN", "WORKER"];

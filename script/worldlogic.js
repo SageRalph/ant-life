@@ -14,6 +14,7 @@ class Worldlogic {
       WORKER: this._workerAction,
       PEST: this._pestAction,
       EGG: this._eggAction,
+      TRAIL: this._trailAction,
     };
 
     const tile = this.world.getTile(x, y);
@@ -130,10 +131,8 @@ class Worldlogic {
       return this.world.setTile(x, y, "CORPSE");
     }
 
-    if (
-      this.world.checkTile(x, y - 1, "AIR") &&
-      this._touching(x, y, CLIMB_MASK) === 0
-    ) {
+    // when unsupported on all sides, move down
+    if (!this._climbable(x, y)) {
       return this.world.swapTiles(x, y, x, y - 1);
     }
 
@@ -195,6 +194,44 @@ class Worldlogic {
       this.world.swapTiles(x, y, x, y - 1, ["AIR", "WATER"]) ||
       this.world.swapTiles(x, y, x - bias, y - 1, ["AIR", "WATER"]) ||
       this.world.swapTiles(x, y, x + bias, y - 1, ["AIR", "WATER"])
+    );
+  }
+
+  _trailAction(x, y) {
+    // Instantly destroyed on contact with anything that moves
+    if (this._touching(x, y, ["AIR", "TRAIL"]) < 8) {
+      return this.world.setTile(x, y, "AIR");
+    }
+
+    // when unsupported on all sides, move down but don't stack
+    if (!this._climbable(x, y)) {
+      if (this.world.checkTile(x, y - 1, "TRAIL")) {
+        this.world.setTile(x, y, "AIR");
+      } else {
+        this.world.swapTiles(x, y, x, y - 1);
+      }
+    }
+
+    // find a worker to draw
+    const targets = this._touchingWhich(x, y, ["WORKER"], WORKER_RANGE);
+    if (!targets.length) return false;
+    const { a, b } = targets[randomIntInclusive(0, targets.length - 1)];
+
+    // move worker towards if possible
+    const desiredA = a + Math.sign(x - a);
+    const desiredB = b + Math.sign(y - b);
+    return (
+      this._climbable(a, b) &&
+      (this.world.swapTiles(a, b, desiredA, desiredB, WALK_MASK) ||
+        this.world.swapTiles(a, b, a, desiredB, WALK_MASK) ||
+        this.world.swapTiles(a, b, desiredA, b, WALK_MASK))
+    );
+  }
+
+  _climbable(x, y) {
+    return (
+      !this.world.checkTile(x, y - 1, ["AIR", "TRAIL"]) ||
+      this._touching(x, y, CLIMB_MASK) > 0
     );
   }
 
