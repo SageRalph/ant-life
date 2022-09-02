@@ -102,11 +102,6 @@ class Worldlogic {
       return this.world.swapTiles(x, y, x, y - 1);
     }
 
-    // when touching fungus, convert to fungus
-    if (Math.random() <= CONVERT_PROB * this._touching(x, y, ["FUNGUS"])) {
-      return this.world.setTile(x, y, "FUNGUS");
-    }
-
     // chance to grow up/down or left/right or diagonal
     if (
       Math.random() <=
@@ -128,6 +123,22 @@ class Worldlogic {
     if (Math.random() <= KILL_PROB && this._exposedToSky(x, y)) {
       return this.world.setTile(x, y, "SAND");
     }
+
+    // when unsupported, move down
+    if (
+      this.world.checkTile(x, y - 1, ["AIR", "WATER"]) &&
+      this._touching(x, y, ["FUNGUS", "PLANT"]) < 2
+    ) {
+      return this.world.swapTiles(x, y, x, y - 1);
+    }
+
+    // When touching plant, convert to fungus
+    if (Math.random() <= CONVERT_PROB) {
+      if (this._setOneTouching(x, y, "FUNGUS", ["PLANT"])) {
+        return true;
+      }
+    }
+
     return;
   }
 
@@ -265,9 +276,10 @@ class Worldlogic {
     const dx = randomIntInclusive(-1, 1);
     const dy = randomIntInclusive(-1, 1);
 
-    // when pushing, swap the two tiles in front
-    if (pushMask) {
-      this.world.swapTiles(x + dx, y + dy, x + dx + dx, y + dy + dy, pushMask);
+    // when moving into a pushable tile, swap the two tiles in front
+    if (pushMask && this.world.checkTile(x + dx, y + dy, pushMask)) {
+      // push less vertically than horizontally
+      this.world.swapTiles(x + dx, y + dy, x + dx + dx, y + dy, mask);
     }
 
     // swap with tile in front
