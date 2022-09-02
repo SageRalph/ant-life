@@ -5,9 +5,14 @@ class Worldlogic {
 
   tick() {
     this.world.age += 1;
+
+    // Randomly alternate left-to-right and right-to-left to avoid turn-order bias
+    const bias = Math.random() <= 0.5;
+
     for (let y = 0; y < this.world.rows; y++) {
       for (let x = 0; x < this.world.cols; x++) {
-        this._doTileAction(x, y);
+        const dx = bias ? x : this.world.cols - 1 - x;
+        this._doTileAction(dx, y);
       }
     }
   }
