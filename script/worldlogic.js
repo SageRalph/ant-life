@@ -159,7 +159,7 @@ class Worldlogic {
     }
 
     // move randomly
-    return this._moveRandom(x, y, WALK_MASK);
+    return this._moveRandom(x, y, WALK_MASK, PUSH_MASK);
   }
 
   _pestAction(x, y) {
@@ -260,9 +260,17 @@ class Worldlogic {
     );
   }
 
-  _moveRandom(x, y, mask) {
+  _moveRandom(x, y, mask, pushMask = false) {
+    // determine direction
     const dx = randomIntInclusive(-1, 1);
     const dy = randomIntInclusive(-1, 1);
+
+    // when pushing, swap the two tiles in front
+    if (pushMask) {
+      this.world.swapTiles(x + dx, y + dy, x + dx + dx, y + dy + dy, pushMask);
+    }
+
+    // swap with tile in front
     return this.world.swapTiles(x, y, x + dx, y + dy, mask);
   }
 

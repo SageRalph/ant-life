@@ -73,3 +73,6 @@ const PEST_TARGET_MASK = ["EGG", "QUEEN", "WORKER"];
 
 // Tiles water will kill
 const WATER_KILL_MASK = ["WORKER", "QUEEN", "EGG", "PEST"];
+
+// Tiles workers can push when they move
+const PUSH_MASK = ["PLANT", "FUNGUS", "CORPSE"];
