@@ -36,6 +36,7 @@ class Worldgen {
     hollowCount = 15,
     hollowMinSize = 4,
     hollowMaxSize = 10,
+    surfacePlantCount = 10,
     plantCount = 300,
     fungusCount = 30,
     fungusMinSize = 1,
@@ -127,7 +128,12 @@ class Worldgen {
     ]);
 
     // Surface Plant
-    this.world.doRain(this.world.cols / 3, "PLANT");
+    const plantProb = surfacePlantCount / 100;
+    for (let x = 0; x < this.world.cols; x++) {
+      if (Math.random() <= plantProb) {
+        this.world.setTile(x, this._findSurfaceY(x)+1, "PLANT");
+      }
+    }
 
     // Bedrock
     for (let x = 0; x < this.world.cols; x++) {
@@ -175,5 +181,12 @@ class Worldgen {
         mask,
       );
     }
+  }
+
+  _findSurfaceY(x) {
+    for (let y = this.world.rows - 1; y >= 0; y--) {
+      if (!this.world.checkTile(x, y, ["AIR", "WATER"])) return y;
+    }
+    return 0;
   }
 }
