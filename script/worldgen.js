@@ -5,6 +5,7 @@ class Worldgen {
 
   generateBenchmarkWorld(mask = Object.keys(TILESET)) {
     this.world.age = 0;
+    this.world.surfaceY = this.world.rows - 1;
 
     // World containing random tiles
     this.world.tiles = [];

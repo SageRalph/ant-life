@@ -102,10 +102,10 @@ class Worldlogic {
       return this.world.swapTiles(x, y, x, y - 1);
     }
 
-    // chance to grow up/down or left/right or diagonal
+    // chance to grow up/down or left/right or diagonal, reduced by nearby plant/fungus
     if (
       Math.random() <=
-      GROW_PROB / (this._touching(x, y, ["PLANT"], 3) ** 2 + 1)
+      GROW_PROB / (this._touching(x, y, ["PLANT", "FUNGUS"], 3) ** 2 + 1)
     ) {
       const bias = randomSign();
       const bias2 = randomSign();
@@ -132,8 +132,8 @@ class Worldlogic {
       return this.world.swapTiles(x, y, x, y - 1);
     }
 
-    // When touching plant, convert to fungus
-    if (Math.random() <= CONVERT_PROB) {
+    // When underground and touching plant, convert to fungus
+    if (y < this.world.surfaceY && Math.random() <= CONVERT_PROB) {
       if (this._setOneTouching(x, y, "FUNGUS", ["PLANT"])) {
         return true;
       }
