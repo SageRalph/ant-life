@@ -119,10 +119,10 @@ class Worldlogic {
   }
 
   _fungusAction(x, y) {
-    // Destroyed by air
-    if (Math.random() <= KILL_PROB && this._exposedToSky(x, y)) {
-      return this.world.setTile(x, y, "SAND");
-    }
+    // // Destroyed by air
+    // if (Math.random() <= KILL_PROB && this._exposedToSky(x, y)) {
+    //   return this.world.setTile(x, y, "SAND");
+    // }
 
     // when unsupported, move down
     if (
