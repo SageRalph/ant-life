@@ -154,8 +154,9 @@ class Worldlogic {
         return this._moveRandom(x, y, WALK_MASK);
       }
       // when touching fungus, converts one to egg, else move any direction towards closest fungus
+      const tileLaid = Math.random() <= EGG_LAY_PROB ? "EGG" : "AIR";
       return (
-        this._setOneTouching(x, y, "EGG", ["FUNGUS"]) ||
+        this._setOneTouching(x, y, tileLaid, ["FUNGUS"]) ||
         this._searchForTile(x, y, ["FUNGUS"], QUEEN_RANGE, WALK_MASK) ||
         this._moveRandom(x, y, WALK_MASK) // unreachable target
       );

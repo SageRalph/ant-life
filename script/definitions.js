@@ -39,6 +39,7 @@ let KILL_PROB = 0.01; // Chance per tick for each hazard to kill
 let EVAPORATE_PROB = 0.008; // Chance per tick for water to evaporate
 let CONVERT_PROB = 0.03; // Chance per tick for fungus/plant to convert
 let GROW_PROB = 0.1; // Base chance per tick for a lone plant tile to grow (reduced by crowding)
+let EGG_LAY_PROB = 0.5; // Chance that an egg is laid when a queen eats fungus
 let EGG_HATCH_PROB = 0.005; // Chance per tick for an egg to hatch
 let EGG_QUEEN_PROB = 0.01; // Chance for a hatching egg to be a queen
 let QUEEN_SPEED = 0.1; // The queen will only act this proportion of ticks
