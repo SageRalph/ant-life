@@ -361,4 +361,6 @@ class Worldlogic {
   }
 }
 
-module.exports = { Worldlogic };
+if (typeof module === 'object') {
+  module.exports = { Worldlogic };
+}

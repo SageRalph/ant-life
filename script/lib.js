@@ -17,9 +17,11 @@ function average(arr) {
   return arr.reduce((p, c) => p + c, 0) / arr.length;
 }
 
-module.exports = {
-  pointWithinRadius,
-  randomIntInclusive,
-  randomSign,
-  average,
-};
+if (typeof module === 'object') {
+  module.exports = {
+    pointWithinRadius,
+    randomIntInclusive,
+    randomSign,
+    average,
+  };
+}

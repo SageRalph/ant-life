@@ -191,4 +191,6 @@ class Worldgen {
   }
 }
 
-module.exports = { Worldgen };
+if (typeof module === 'object') {
+  module.exports = { Worldgen };
+}

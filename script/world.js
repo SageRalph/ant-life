@@ -226,4 +226,6 @@ class World {
   }
 }
 
-module.exports = { World };
+if (typeof module === 'object') {
+  module.exports = { World };
+}
