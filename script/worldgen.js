@@ -190,3 +190,5 @@ class Worldgen {
     return 0;
   }
 }
+
+module.exports = { Worldgen };

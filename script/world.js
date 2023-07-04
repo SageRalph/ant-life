@@ -225,3 +225,5 @@ class World {
     return Math.round(1000 / average(batches));
   }
 }
+
+module.exports = { World };

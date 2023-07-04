@@ -360,3 +360,5 @@ class Worldlogic {
     return false;
   }
 }
+
+module.exports = { Worldlogic };
