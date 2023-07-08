@@ -1,3 +1,4 @@
+
 class World {
   constructor(rows = ROW_COUNT, cols = COL_COUNT, generatorSettings = {}) {
     this.rows = rows;
@@ -175,8 +176,14 @@ class World {
     });
   }
 
-  _legal(x, y) {
-    return x >= 0 && y >= 0 && x < this.cols && y < this.rows;
+
+  async _legal(x, y) {
+    if (!this.legalFunction) {
+      const { legal } = await import('../pkg/ant_life_optimised.js');
+      this.legalFunction = legal;
+    }
+
+    return await this.legalFunction(this.rows, this.cols, x, y);
   }
 
   benchmark() {

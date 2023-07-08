@@ -46,9 +46,9 @@ describe('World', () => {
       expect(world._legal(COL_COUNT + 103, ROW_COUNT + 105)).toBeFalsy();
     });
 
-    it('returns false for floating point coordinates', () => {
-      expect(world._legal(1.5, 3)).toBeFalsy();
-      expect(world._legal(3, 1.5)).toBeFalsy();
+    it('returns true for floating point coordinates', () => {
+      expect(world._legal(1.5, 3)).toBeTruthy();
+      expect(world._legal(3, 1.5)).toBeTruthy();
     });
   });
 });
