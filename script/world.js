@@ -106,26 +106,26 @@ class World {
     const me = this;
     this.chunks = [];
 
-    for (let b = 0; b < this.rows / CHUNK_SIZE; b++) {
+    for (let cy = 0; cy < this.rows / CHUNK_SIZE; cy++) {
       this.chunks.push([]);
-      for (let a = 0; a < this.cols / CHUNK_SIZE; a++) {
+      for (let cx = 0; cx < this.cols / CHUNK_SIZE; cx++) {
         // Create chunk with zeroed counts for all tile types
         let blankChunk = {};
         for (let tile of Object.keys(TILESET)) {
           blankChunk[tile] = 0;
         }
-        this.chunks[b].push(blankChunk);
+        this.chunks[cy].push(blankChunk);
 
         // Count tiles in chunk
-        const b0 = b * CHUNK_SIZE;
-        const a0 = a * CHUNK_SIZE;
+        const cy0 = cy * CHUNK_SIZE;
+        const cx0 = cx * CHUNK_SIZE;
         this.forEachTile(
-          a0,
-          b0,
-          a0 + CHUNK_SIZE,
-          b0 + CHUNK_SIZE,
+          cx0,
+          cy0,
+          cx0 + CHUNK_SIZE,
+          cy0 + CHUNK_SIZE,
           function (x, y) {
-            me.chunks[b][a][me.getTile(x, y)]++;
+            me.chunks[cy][cx][me.getTile(x, y)]++;
           },
         );
       }
