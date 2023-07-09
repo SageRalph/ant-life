@@ -1,9 +1,9 @@
-let DEBUG = false;
-let BENCHMARK_TICKS = 100;
-let BENCHMARK_BATCHES = 10;
-let BENCHMARK_DENSITY = 0.05;
+let DEBUG = false; // Show debug info in the console
+let BENCHMARK_TICKS = 100; // Number of simulation steps to run the benchmark for
+let BENCHMARK_BATCHES = 10; // Benchmarks are averaged over this many runs
+let BENCHMARK_DENSITY = 0.05; // Proportion of tiles that are not air in benchmark worlds, this ensures tiles can move around
 
-const TPS = 30;
+const TPS = 30; // Game speed in (max) ticks per second
 const START_PAUSED = false;
 
 const TILESET = {

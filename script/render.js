@@ -17,6 +17,9 @@ class Renderer {
     this._ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
 
+  /**
+   * Draw the current world state. Optimised to only draw changed tiles.
+   */
   draw() {
     /// loop through rows and columns
     for (let y = 0; y < this.world.rows; y++) {
@@ -46,6 +49,12 @@ class Renderer {
     this.oldTiles = JSON.parse(JSON.stringify(this.world.tiles));
   }
 
+  /**
+   * Convert canvas coordinates to world coordinates
+   * @param {number} x - Canvas x coordinate
+   * @param {number} y - Canvas y coordinate
+   * @returns {object} - World coordinates {x, y}
+   */
   mapCoordinates(x, y) {
     const rect = this.canvas.getBoundingClientRect();
     const scaleX = this.canvas.width / rect.width;
