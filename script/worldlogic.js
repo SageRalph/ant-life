@@ -37,6 +37,7 @@ class Worldlogic {
       WATER: this._waterAction,
       PLANT: this._plantAction,
       FUNGUS: this._fungusAction,
+      RICH_FUNGUS: this._fungusAction,
       QUEEN: this._queenAction,
       WORKER: this._workerAction,
       PEST: this._pestAction,
@@ -140,7 +141,8 @@ class Worldlogic {
     // chance to grow up/down or left/right or diagonal, reduced by nearby plant/fungus
     if (
       Math.random() <=
-      GROW_PROB / (this._touching(x, y, ["PLANT", "FUNGUS"], 3) ** 2 + 1)
+      GROW_PROB /
+        (this._touching(x, y, ["PLANT", "FUNGUS", "RICH_FUNGUS"], 3) ** 2 + 1)
     ) {
       const bias = randomSign();
       const bias2 = randomSign();
@@ -166,9 +168,16 @@ class Worldlogic {
     // when unsupported, move down
     if (
       this.world.checkTile(x, y - 1, ["AIR", "WATER"]) &&
-      this._touching(x, y, ["FUNGUS", "PLANT"]) < 2
+      this._touching(x, y, ["FUNGUS", "RICH_FUNGUS", "PLANT"]) < 2
     ) {
       return this.world.swapTiles(x, y, x, y - 1);
+    }
+
+    // When underground and touching corpse, convert to RICH_FUNGUS
+    if (y < this.world.surfaceY && Math.random() <= CONVERT_PROB) {
+      if (this._setOneTouching(x, y, "RICH_FUNGUS", ["CORPSE"])) {
+        return true;
+      }
     }
 
     // When underground and touching plant, convert to fungus
@@ -196,14 +205,25 @@ class Worldlogic {
 
     if (Math.random() <= QUEEN_SPEED) {
       // when few fungus nearby, move randomly
-      if (this._touching(x, y, ["FUNGUS"], QUEEN_RANGE) < QUEEN_FUNGUS_MIN) {
+      if (
+        this._touching(x, y, ["FUNGUS", "RICH_FUNGUS"], QUEEN_RANGE) <
+        QUEEN_FUNGUS_MIN
+      ) {
         return this._moveRandom(x, y, WALK_MASK);
       }
       // when touching fungus, converts one to egg, else move any direction towards closest fungus
+      // RICH_FUNGUS always converts to EGG
       const tileLaid = Math.random() <= EGG_LAY_PROB ? "EGG" : "AIR";
       return (
+        this._setOneTouching(x, y, "EGG", ["RICH_FUNGUS"]) ||
         this._setOneTouching(x, y, tileLaid, ["FUNGUS"]) ||
-        this._searchForTile(x, y, ["FUNGUS"], QUEEN_RANGE, WALK_MASK) ||
+        this._searchForTile(
+          x,
+          y,
+          ["FUNGUS", "RICH_FUNGUS"],
+          QUEEN_RANGE,
+          WALK_MASK,
+        ) ||
         this._moveRandom(x, y, WALK_MASK) // unreachable target
       );
     }

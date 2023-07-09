@@ -18,6 +18,7 @@ const TILESET = {
   PLANT: "olivedrab",
   WATER: "blue",
   FUNGUS: "teal",
+  RICH_FUNGUS: "teal",
   PEST: "fuchsia",
   TRAIL: "yellow",
 };
@@ -56,16 +57,25 @@ const CLIMB_MASK = [
   "SAND",
   "STONE",
   "FUNGUS",
+  "RICH_FUNGUS",
   "CORPSE",
   "WORKER",
   "EGG",
 ];
 
 // Tiles ants can move through (also used by pests when hunting)
-const WALK_MASK = ["AIR", "CORPSE", "EGG", "PLANT", "FUNGUS", "TRAIL"];
+const WALK_MASK = [
+  "AIR",
+  "CORPSE",
+  "EGG",
+  "PLANT",
+  "FUNGUS",
+  "RICH_FUNGUS",
+  "TRAIL",
+];
 
 // Tiles pests can move through when wandering
-const ROAM_MASK = ["AIR", "CORPSE", "FUNGUS", "TRAIL"];
+const ROAM_MASK = ["AIR", "CORPSE", "FUNGUS", "RICH_FUNGUS", "TRAIL"];
 
 // Tiles plants can grow into
 const PLANT_GROW_MASK = ["AIR", "WATER", "CORPSE", "TRAIL"];
