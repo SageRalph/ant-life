@@ -13,6 +13,8 @@ class Renderer {
     this._xOffset = (canvas.width - this._tileSize * world.cols) / 2;
     this._yOffset = (canvas.height - this._tileSize * world.rows) / 2;
     this.fillStyle = "AIR";
+    // Clear canvas
+    this._ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
 
   draw() {
