@@ -38,6 +38,7 @@ let COL_COUNT = 100; // World width
 // These are modifiable during run-time using the browser console and take effect immediately
 let CHUNK_SIZE = 20; // Optimisation for faster searching, must be factor of ROW_COUNT and COL_COUNT
 let KILL_PROB = 0.01; // Chance per tick for each hazard to kill
+let WORKER_RANDOM_DEATH_PROB = 0.0001; // Chance per tick for a worker to die of old age (old age, injury etc.)
 let EVAPORATE_PROB = 0.008; // Chance per tick for water to evaporate
 let CONVERT_PROB = 0.03; // Chance per tick for fungus/plant to convert
 let GROW_PROB = 0.1; // Base chance per tick for a lone plant tile to grow (reduced by crowding)

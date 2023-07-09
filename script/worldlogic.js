@@ -234,8 +234,14 @@ class Worldlogic {
    * Performs the action for a WORKER tile
    * WORKER falls down when unable to climb and moves randomly.
    * When moving randomly, WORKER will push adjacent tiles, spreading them around.
+   * WORKERs have a small chance to die randomly.
    */
   _workerAction(x, y) {
+    // Random chance to die (old age, injury etc.)
+    if (Math.random() <= WORKER_RANDOM_DEATH_PROB) {
+      return this.world.setTile(x, y, "CORPSE");
+    }
+
     // when unsupported on all sides, move down
     if (!this._climbable(x, y)) {
       return this.world.swapTiles(x, y, x, y - 1);
