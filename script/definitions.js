@@ -25,8 +25,8 @@ const TILESET = {
 // Tiles that can be overridden with the brush
 const PAINTABLE_MASK = ["AIR", "SOIL", "SAND"];
 
-const ROW_COUNT = 100; // World width
-const COL_COUNT = 100; // World height
+const ROW_COUNT = 100; // World height
+const COL_COUNT = 100; // World width
 const CHUNK_SIZE = 20; // Optimisation for faster searching, must be factor of ROW_COUNT and COL_COUNT
 
 const RAIN_FREQ = 2500; // How often (in game ticks) it rains

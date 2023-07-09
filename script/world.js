@@ -108,7 +108,7 @@ class World {
 
     for (let b = 0; b < this.rows / CHUNK_SIZE; b++) {
       this.chunks.push([]);
-      for (let a = 0; a < this.rows / CHUNK_SIZE; a++) {
+      for (let a = 0; a < this.cols / CHUNK_SIZE; a++) {
         // Create chunk with zeroed counts for all tile types
         let blankChunk = {};
         for (let tile of Object.keys(TILESET)) {
@@ -146,7 +146,7 @@ class World {
 
   forEachTile(minX, minY, maxX, maxY, func) {
     for (let y = Math.max(minY, 0); y <= Math.min(maxY, this.rows - 1); y++) {
-      for (let x = Math.max(minX, 0); x <= Math.min(maxX, this.rows - 1); x++) {
+      for (let x = Math.max(minX, 0); x <= Math.min(maxX, this.cols - 1); x++) {
         func(x, y);
       }
     }
