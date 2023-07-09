@@ -32,7 +32,6 @@ body {
   border: solid gray 1px;
   display: block;
   margin: 0 auto;
-  aspect-ratio: 1;
   width: 100%;
 }
 
