@@ -16,6 +16,13 @@ class Worldlogic {
     // Randomly alternate left-to-right and right-to-left to avoid turn-order bias
     const bias = Math.random() <= 0.5;
 
+    // Set all workers as having not been ordered to MOVE yet
+    this.world.forEachTile(0, 0, this.world.cols, this.world.rows, (x, y) => {
+      if (this.world.getTile(x, y) === "WORKER_ORDERED") {
+        this.world.setTile(x, y, "WORKER");
+      }
+    });
+
     for (let y = 0; y < this.world.rows; y++) {
       for (let x = 0; x < this.world.cols; x++) {
         const dx = bias ? x : this.world.cols - 1 - x;
@@ -40,9 +47,14 @@ class Worldlogic {
       RICH_FUNGUS: this._fungusAction,
       QUEEN: this._queenAction,
       WORKER: this._workerAction,
+      WORKER_ORDERED: this._workerAction,
       PEST: this._pestAction,
       EGG: this._eggAction,
-      TRAIL: this._trailAction,
+      MOVE_SELF: this._moveAction.bind(this, false),
+      MOVE_PLANT: this._moveAction.bind(this, ["PLANT"]),
+      MOVE_FUNGUS: this._moveAction.bind(this, ["FUNGUS", "RICH_FUNGUS"]),
+      MOVE_EGG: this._moveAction.bind(this, ["EGG"]),
+      MOVE_CORPSE: this._moveAction.bind(this, ["CORPSE"]),
     };
 
     const tile = this.world.getTile(x, y);
@@ -131,9 +143,11 @@ class Worldlogic {
    */
   _plantAction(x, y) {
     // when unsupported, move down
+    // needs support directly and also in radius 2 to reduce floating plants
     if (
       this.world.checkTile(x, y - 1, ["AIR", "WATER"]) &&
-      this._touching(x, y, ["PLANT"]) < 2
+      (this._touching(x, y, ["PLANT"]) < 2 ||
+        this._touching(x, y, ["PLANT"], 2) < 4)
     ) {
       return this.world.swapTiles(x, y, x, y - 1);
     }
@@ -258,7 +272,10 @@ class Worldlogic {
    */
   _pestAction(x, y) {
     // Destroyed by workers
-    if (Math.random() <= KILL_PROB * this._touching(x, y, ["WORKER"])) {
+    if (
+      Math.random() <=
+      KILL_PROB * this._touching(x, y, ["WORKER", "WORKER_ORDERED"])
+    ) {
       return this.world.setTile(x, y, "CORPSE");
     }
 
@@ -310,30 +327,49 @@ class Worldlogic {
   }
 
   /**
-   * Performs the action for a TRAIL tile
-   * TRAIL falls down but is destroyed on contact with anything except air.
-   * TRAIL draws a random WORKER within range (if any) towards it. This is separate
-   * from the WORKER action, so TRAIL lets WORKERs move faster than usual.
+   * Performs the action for any type of MOVE tile
+   * MOVE falls down but are destroyed on contact with anything except air.
+   * MOVE draws a random WORKER within range (if any) towards it, optionally
+   * instructing the WORKER to attempt to drag a tile with it. This is separate
+   * from the WORKER action, so MOVE lets WORKERs move faster than usual.
    */
-  _trailAction(x, y) {
+  _moveAction(carryMask, x, y) {
     let result = false;
 
     // when unsupported on all sides, move down but don't stack
     if (!this._climbable(x, y)) {
-      if (this.world.checkTile(x, y - 1, "TRAIL")) {
+      if (this.world.checkTile(x, y - 1, ORDERS)) {
         this.world.setTile(x, y, "AIR");
       } else {
-        this.world.swapTiles(x, y, x, y - 1);
+        this.world.swapTiles(x, y, x, y - 1, ["AIR"]);
       }
     }
 
-    // find a worker to draw
-    const targets = this._touchingWhich(x, y, ["WORKER"], WORKER_RANGE);
+    // find a worker to draw, filtered by carry mask if set (e.g. only draw workers near fungus)
+    let targets = this._touchingWhich(x, y, ["WORKER"], WORKER_RANGE);
+    let draggablePerTarget;
+    if (carryMask) {
+      draggablePerTarget = targets.map(({ a, b }) =>
+        this._touchingWhich(a, b, carryMask),
+      );
+      // remove targets with no draggable workers
+      for (let i = targets.length - 1; i >= 0; i--) {
+        if (!draggablePerTarget[i].length) {
+          targets.splice(i, 1);
+          draggablePerTarget.splice(i, 1);
+        }
+      }
+    }
+
     if (!targets.length) {
       result = false;
     } else {
       // choose one at random
-      const { a, b } = targets[randomIntInclusive(0, targets.length - 1)];
+      const target_index = randomIntInclusive(0, targets.length - 1);
+      const { a, b } = targets[target_index];
+
+      // mark the target as having followed an order so other MOVE tiles don't also target it
+      this.world.setTile(a, b, "WORKER_ORDERED");
 
       // move worker towards if possible
       const desiredA = a + Math.sign(x - a);
@@ -341,16 +377,27 @@ class Worldlogic {
       result =
         this._climbable(a, b) &&
         (this.world.swapTiles(a, b, desiredA, desiredB, WALK_MASK) ||
-          this.world.swapTiles(a, b, a, desiredB, WALK_MASK) ||
-          this.world.swapTiles(a, b, desiredA, b, WALK_MASK));
+          this.world.swapTiles(a, b, desiredA, b, WALK_MASK) ||
+          this.world.swapTiles(a, b, a, desiredB, WALK_MASK));
+
+      // attempt to drag a tile behind it
+      if (result && carryMask) {
+        if (draggablePerTarget[target_index].length) {
+          const { a: dragA, b: dragB } =
+            draggablePerTarget[target_index][
+              randomIntInclusive(0, draggablePerTarget[target_index].length - 1)
+            ];
+          this.world.swapTiles(dragA, dragB, desiredA, desiredB + 1, WALK_MASK);
+        }
+      }
     }
 
     // Instantly destroyed on contact with anything that moves
     // Note: this is done after drawing workers so it works when touching a surface
     // however, this means we have to check that its not been consumed yet
     if (
-      this.world.checkTile(x, y, ["TRAIL"]) && // check not consumed
-      this._touching(x, y, ["AIR", "TRAIL"]) < 8
+      this.world.checkTile(x, y, ORDERS) && // check not consumed
+      this._touching(x, y, ["AIR"].concat(ORDERS)) < 8
     ) {
       return this.world.setTile(x, y, "AIR");
     }
@@ -365,7 +412,7 @@ class Worldlogic {
    */
   _climbable(x, y) {
     return (
-      !this.world.checkTile(x, y - 1, ["AIR", "TRAIL"]) ||
+      !this.world.checkTile(x, y - 1, ["AIR"].concat(ORDERS)) ||
       this._touching(x, y, CLIMB_MASK) > 0
     );
   }

@@ -59,7 +59,11 @@
           <span>Brush</span>
           <select id="brush-mat">
             <optgroup label="Pheromones">
-              <option>TRAIL</option>
+              <option>MOVE_SELF</option>
+              <option>MOVE_PLANT</option>
+              <option>MOVE_FUNGUS</option>
+              <option>MOVE_EGG</option>
+              <option>MOVE_CORPSE</option>
             </optgroup>
             <optgroup label="Materials">
               <option>AIR</option>
@@ -98,8 +102,13 @@
         <table>
           <tr>
             <th style="color: yellow">Gold</th>
-            <th>Trail</th>
+            <th>Move</th>
             <td>Encourages Workers to go to the area</td>
+          </tr>
+          <tr>
+            <th style="color: yellow">Gold</th>
+            <th>Move X</th>
+            <td>Encourages Workers near something to move it to the area</td>
           </tr>
           <tr>
             <th style="color: peru">Brown</th>

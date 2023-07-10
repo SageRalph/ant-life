@@ -12,6 +12,7 @@ const TILESET = {
   SAND: "sandybrown",
   STONE: "slategray",
   WORKER: "red",
+  WORKER_ORDERED: "red",
   QUEEN: "blueviolet",
   EGG: "white",
   CORPSE: "black",
@@ -20,8 +21,21 @@ const TILESET = {
   FUNGUS: "teal",
   RICH_FUNGUS: "teal",
   PEST: "fuchsia",
-  TRAIL: "yellow",
+  MOVE_SELF: "yellow",
+  MOVE_PLANT: "yellow",
+  MOVE_FUNGUS: "yellow",
+  MOVE_EGG: "yellow",
+  MOVE_CORPSE: "yellow",
 };
+
+// These are listed here so they can used as a shorthand
+const ORDERS = [
+  "MOVE_SELF",
+  "MOVE_PLANT",
+  "MOVE_FUNGUS",
+  "MOVE_EGG",
+  "MOVE_CORPSE",
+];
 
 // Tiles that can be overridden with the brush
 const PAINTABLE_MASK = ["AIR", "SOIL", "SAND"];
@@ -50,7 +64,7 @@ let QUEEN_RANGE = 20; // Search radius of queens
 let QUEEN_FUNGUS_MIN = 8; // Minimum fungus tiles in range for queen to feed
 let PEST_SEEK_PROB = 0.2; // Chance per tick for a pest to seek a target
 let PEST_RANGE = 20; // Search radius of pests
-let WORKER_RANGE = 15; // Search radius of workers
+let WORKER_RANGE = 20; // Search radius of workers
 
 // Tiles ants can climb
 const CLIMB_MASK = [
@@ -61,6 +75,7 @@ const CLIMB_MASK = [
   "RICH_FUNGUS",
   "CORPSE",
   "WORKER",
+  "WORKER_ORDERED", // disabled to prevent pileups when ordered to MOVE
   "EGG",
 ];
 
@@ -72,20 +87,19 @@ const WALK_MASK = [
   "PLANT",
   "FUNGUS",
   "RICH_FUNGUS",
-  "TRAIL",
-];
+].concat(ORDERS);
 
 // Tiles pests can move through when wandering
-const ROAM_MASK = ["AIR", "CORPSE", "FUNGUS", "RICH_FUNGUS", "TRAIL"];
+const ROAM_MASK = ["AIR", "CORPSE", "FUNGUS", "RICH_FUNGUS"].concat(ORDERS);
 
 // Tiles plants can grow into
-const PLANT_GROW_MASK = ["AIR", "WATER", "CORPSE", "TRAIL"];
+const PLANT_GROW_MASK = ["AIR", "WATER", "CORPSE"].concat(ORDERS);
 
 // Tiles pests will seek to kill
-const PEST_TARGET_MASK = ["EGG", "QUEEN", "WORKER"];
+const PEST_TARGET_MASK = ["EGG", "QUEEN", "WORKER", "WORKER_ORDERED"];
 
 // Tiles water will kill
-const WATER_KILL_MASK = ["WORKER", "QUEEN", "EGG", "PEST"];
+const WATER_KILL_MASK = ["WORKER", "WORKER_ORDERED", "QUEEN", "EGG", "PEST"];
 
 // Tiles workers can push when they move
 const PUSH_MASK = ["PLANT", "CORPSE"];
