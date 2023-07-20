@@ -10,12 +10,20 @@ let BRUSH_X;
 let BRUSH_Y;
 let LAST_ANT_COUNT = 1;
 
+function waitTenSeconds() {
+    return new Promise(resolve => {
+        setTimeout(resolve, 10000);  // 10000 milliseconds = 10 seconds
+    });
+}
+
 $(document).ready(async function () {
-  console.log('hello from document ready')
-  initAntlife();
-  setupControls();
+  console.log('document ready');
+  // await waitTenSeconds();
   const { default: init } = await import('../pkg/ant_life_optimised.js');
   await init();
+  console.log('wasm init run initAntlife()');
+  await initAntlife();
+  setupControls();
   if (!START_PAUSED) {
     $("#btn-pause").trigger("click");
   }
@@ -43,6 +51,7 @@ function pause() {
  * Run the simulation
  */
 function play() {
+  console.log('hello from play');
   $("#btn-pause").text("Pause");
   gameLoop();
 }
@@ -106,10 +115,13 @@ function _setBrushMask() {
   }
 }
 
-function initAntlife() {
+async function initAntlife() {
+  console.log('hello from init ant life');
   if (DEBUG) console.log("Loading...");
   $("#score").text("");
   WORLD = new World();
+  console.log('running WORLD.initialize');
+  await WORLD.initialize();
   RENDERER = new Renderer(document.getElementById("map"), WORLD, TILESET);
   RENDERER.draw();
   prompt(`
