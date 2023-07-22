@@ -19,9 +19,6 @@ function waitTenSeconds() {
 $(document).ready(async function () {
   console.log('document ready');
   // await waitTenSeconds();
-  const { default: init } = await import('../pkg/ant_life_optimised.js');
-  await init();
-  console.log('wasm init run initAntlife()');
   await initAntlife();
   setupControls();
   if (!START_PAUSED) {
@@ -32,8 +29,11 @@ $(document).ready(async function () {
 /**
  * Benchmark simulation performance
  */
-function benchmark() {
-  return new World().benchmark();
+async function benchmark() {
+  const wasm = await import('../pkg/ant_life_optimised.js');
+  await wasm.default(); // default function is init
+
+  return new World(wasm).benchmark();
 }
 
 /**
@@ -116,12 +116,12 @@ function _setBrushMask() {
 }
 
 async function initAntlife() {
-  console.log('hello from init ant life');
+  const wasm = await import('../pkg/ant_life_optimised.js');
+  await wasm.default(); // default function is init
+
   if (DEBUG) console.log("Loading...");
   $("#score").text("");
-  WORLD = new World();
-  console.log('running WORLD.initialize');
-  await WORLD.initialize();
+  WORLD = new World(wasm);
   RENDERER = new Renderer(document.getElementById("map"), WORLD, TILESET);
   RENDERER.draw();
   prompt(`

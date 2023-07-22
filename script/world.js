@@ -1,25 +1,12 @@
 class World {
-  constructor(rows = ROW_COUNT, cols = COL_COUNT, generatorSettings = {}) {
+  constructor(wasm, rows = ROW_COUNT, cols = COL_COUNT, generatorSettings = {}) {
     this.rows = rows;
     this.cols = cols;
     this.age = 0;
     this.ants = 1;
     this.generatorSettings = generatorSettings;
-  }
-
-  async initialize() {
-    console.log('initializing wasm functions');
-    const wasmModule = await import('../pkg/ant_life_optimised.js')
-
-    this.legalWasm = wasmModule.legal;
-    this.checkTileWasm = wasmModule.check_tile;
-    console.log(this.checkTileWasm);
-    if (this.legalWasm == null) {
-      throw new Error('Failed to load legal wasm module');
-    } else {
-      console.log('this.wasm not null')
-    }
-    console.log('finished initializing wasm functions');
+    this._legal = wasm.legal;
+    this.checkTileWasm = wasm.check_tile;
     this.worldgen = new Worldgen(this);
     this.worldlogic = new Worldlogic(this);
     this.worldgen.generate(this.generatorSettings);
