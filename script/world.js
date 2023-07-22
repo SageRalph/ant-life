@@ -10,13 +10,10 @@ class World {
   async initialize() {
     console.log('initializing wasm functions');
     const wasmModule = await import('../pkg/ant_life_optimised.js')
-      .then(({ legal }) => legal)
-      .catch(e => console.error('Error while loading legal:', e));
 
-    this.legalWasm = wasmModule;
-    console.log('--------------------------------');
-    console.log(wasmModule);
-    console.log('--------------------------------');
+    this.legalWasm = wasmModule.legal;
+    this.checkTileWasm = wasmModule.check_tile;
+    console.log(this.checkTileWasm);
     if (this.legalWasm == null) {
       throw new Error('Failed to load legal wasm module');
     } else {
@@ -79,15 +76,10 @@ class World {
   }
 
   checkTile(x, y, mask) {
-    // if (this.checkTileWasm == null)
-    // console.log('check tile wasm null');
-    if (!this._legal(x, y)) return false;
-    if (!mask) return true;
-    return mask.includes(this.getTile(x, y));
-
-    // const tilesJson = JSON.stringify(this.tiles);
-    // const maskJson = JSON.stringify(mask);
-    // return this.checkTileWasm(tilesJson, this.rows, this.cols, x, y, maskJson);
+    // why is tile undefined sometimes???
+    const tile = this.getTile(x, y) ? this.getTile(x, y) : 'undefined';
+    const maskJson = JSON.stringify(mask);
+    return this.checkTileWasm(tile, this.rows, this.cols, x, y, maskJson);
   }
 
   checkChunks(x, y, mask, distance = 0, threshold = 1) {

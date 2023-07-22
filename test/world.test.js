@@ -25,10 +25,13 @@ global.COL_COUNT = definitions.COL_COUNT;
 describe('World', () => {
   describe('_legal', () => {
     let world;
-    beforeEach(() => {
+    beforeEach(async () => {
       world = new World();
+      await world.initialize();
+      console.log(world);
     });
 
+  describe('_legal', () => {
     it('returns true for valid coordinates within the world', () => {
       expect(world._legal(3, 4)).toBeTruthy();
       expect(world._legal(0, 0)).toBeTruthy();
@@ -49,6 +52,34 @@ describe('World', () => {
     it('returns true for floating point coordinates', () => {
       expect(world._legal(1.5, 3)).toBeTruthy();
       expect(world._legal(3, 1.5)).toBeTruthy();
+    });
+  });
+
+  describe('checkTile', () => {
+      it('should return false if coordinates are not legal', () => {
+        world._legal = jest.fn().mockReturnValue(false);
+        expect(world.checkTile(1, 1, [])).toBe(false);
+      });
+
+      it('should return true if coordinates are legal and mask is not provided', () => {
+        world._legal = jest.fn().mockReturnValue(true);
+        expect(world.checkTile(1, 1)).toBe(true);
+      });
+
+      it('should return true if coordinates are legal and tile is in the mask', () => {
+        const tile = 'tile1';
+        world._legal = jest.fn().mockReturnValue(true);
+        world.getTile = jest.fn().mockReturnValue(tile);
+        expect(world.checkTile(1, 1, [tile])).toBe(true);
+      });
+
+      it('should return false if coordinates are legal but tile is not in the mask', () => {
+        const tile = 'tile1';
+        const differentTile = 'tile2';
+        world._legal = jest.fn().mockReturnValue(true);
+        world.getTile = jest.fn().mockReturnValue(differentTile);
+        expect(world.checkTile(1, 1, [tile])).toBe(false);
+      });
     });
   });
 });
