@@ -18,6 +18,7 @@ class Worldgen {
       }
       this.world.tiles.push(row);
     }
+    this.world.setTiles(this.world.tiles);
   }
 
   generate({
@@ -58,10 +59,15 @@ class Worldgen {
       for (let x = 0; x < this.world.cols; x++) {
         // Default to SOIL underground and AIR above
         let tile = y < surfaceY ? "SOIL" : "AIR";
-        row.push(tile);
+        this.world.tiles.push(tile);
       }
       this.world.tiles.push(row);
     }
+
+    console.log(JSON.stringify(this.world.tiles));
+    console.log(this.world.testString('String'));
+    this.world.testString('hello there');
+    this.world.setTiles(JSON.stringify(this.world.tiles));
 
     // Sand
     this._generatePatches(

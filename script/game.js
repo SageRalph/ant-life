@@ -118,10 +118,14 @@ function _setBrushMask() {
 async function initAntlife() {
   const wasm = await import('../pkg/ant_life_optimised.js');
   await wasm.default(); // default function is init
+  const wasmWorld = wasm.World.new(ROW_COUNT, COL_COUNT);
+  console.log('--------------------------------');
+  console.log(wasmWorld);
+  wasmWorld.test_string('hello there');
 
   if (DEBUG) console.log("Loading...");
   $("#score").text("");
-  WORLD = new World(wasm);
+  WORLD = new World(wasmWorld);
   RENDERER = new Renderer(document.getElementById("map"), WORLD, TILESET);
   RENDERER.draw();
   prompt(`

@@ -1,15 +1,37 @@
 class World {
   constructor(wasm, rows = ROW_COUNT, cols = COL_COUNT, generatorSettings = {}) {
+    console.log('hello World constructor');
+    console.log(wasm);
+    wasm.test_string('still working here');
     this.rows = rows;
     this.cols = cols;
     this.age = 0;
     this.ants = 1;
     this.generatorSettings = generatorSettings;
-    this._legal = wasm.legal;
-    this.checkTileWasm = wasm.check_tile;
+    // this._legal = wasm.legal;
+    // this.checkTileWasm = wasm.check_tile;
+    this.setTiles = wasm.set_tiles;
+    this.testString = wasm.test_string;
+    wasm.test_string('still working here too');
+    this.testString('not working here though');
+    //this.getTile = wasm.get_tile;
     this.worldgen = new Worldgen(this);
     this.worldlogic = new Worldlogic(this);
     this.worldgen.generate(this.generatorSettings);
+  }
+
+  checkTile(x, y, mask) {
+    if (!this._legal(x, y)) return false;
+    if (!mask) return true;
+    return mask.includes(this.getTile(x, y));
+  }
+
+  getTile(x, y) {
+    return this.tiles[y][x];
+  }
+
+  _legal(x, y) {
+    return x >= 0 && y >= 0 && x < this.cols && y < this.rows;
   }
 
   tick() {
@@ -49,10 +71,6 @@ class World {
     }
   }
 
-  getTile(x, y) {
-    return this.tiles[y][x];
-  }
-
   setTile(x, y, tile, mask = false) {
     if (!this.checkTile(x, y, mask)) {
       return false;
@@ -62,12 +80,11 @@ class World {
     }
   }
 
-  checkTile(x, y, mask) {
-    // why is tile undefined sometimes???
-    const tile = this.getTile(x, y) ? this.getTile(x, y) : 'undefined';
-    const maskJson = JSON.stringify(mask);
-    return this.checkTileWasm(tile, this.rows, this.cols, x, y, maskJson);
-  }
+  // checkTile(x, y, mask) {
+  //   // why is tile undefined sometimes???
+  //   const maskJson = JSON.stringify(mask);
+  //   return this.checkTileWasm(x, y, maskJson);
+  // }
 
   checkChunks(x, y, mask, distance = 0, threshold = 1) {
     if (!this._legal(x, y)) return false;
@@ -176,14 +193,6 @@ class World {
       if (mask.length && !me.checkTile(x, y, mask)) return;
       me.setTile(x, y, tile);
     });
-  }
-
-  _legal(x, y) {
-    if (this.legalWasm == null) {
-      throw new Error('_legal called when wasm not loaded');
-    }
-    return this.legalWasm(this.rows, this.cols, x, y);
-    // return x >= 0 && y >= 0 && x < this.cols && y < this.rows;
   }
 
   benchmark() {
