@@ -16,9 +16,9 @@ class Worldgen {
         let tile = mask[randomIntInclusive(0, mask.length - 1)];
         row.push(tile);
       }
+      console.log(row);
       this.world.tiles.push(row);
     }
-    this.world.setTiles(this.world.tiles);
   }
 
   generate({
@@ -62,12 +62,8 @@ class Worldgen {
         this.world.tiles.push(tile);
       }
       this.world.tiles.push(row);
+      // this.world.pushTileRow(row)
     }
-
-    console.log(JSON.stringify(this.world.tiles));
-    console.log(this.world.testString('String'));
-    this.world.testString('hello there');
-    this.world.setTiles(JSON.stringify(this.world.tiles));
 
     // Sand
     this._generatePatches(

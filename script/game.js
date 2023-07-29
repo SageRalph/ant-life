@@ -17,8 +17,6 @@ function waitTenSeconds() {
 }
 
 $(document).ready(async function () {
-  console.log('document ready');
-  // await waitTenSeconds();
   await initAntlife();
   setupControls();
   if (!START_PAUSED) {
@@ -119,9 +117,6 @@ async function initAntlife() {
   const wasm = await import('../pkg/ant_life_optimised.js');
   await wasm.default(); // default function is init
   const wasmWorld = wasm.World.new(ROW_COUNT, COL_COUNT);
-  console.log('--------------------------------');
-  console.log(wasmWorld);
-  wasmWorld.test_string('hello there');
 
   if (DEBUG) console.log("Loading...");
   $("#score").text("");

@@ -1,8 +1,5 @@
 class World {
   constructor(wasm, rows = ROW_COUNT, cols = COL_COUNT, generatorSettings = {}) {
-    console.log('hello World constructor');
-    console.log(wasm);
-    wasm.test_string('still working here');
     this.rows = rows;
     this.cols = cols;
     this.age = 0;
@@ -10,10 +7,9 @@ class World {
     this.generatorSettings = generatorSettings;
     // this._legal = wasm.legal;
     // this.checkTileWasm = wasm.check_tile;
-    this.setTiles = wasm.set_tiles;
-    this.testString = wasm.test_string;
-    wasm.test_string('still working here too');
-    this.testString('not working here though');
+    this.setTiles = wasm.set_tiles.bind(wasm);
+    this.pushTileRow = wasm.push_tile_row.bind(wasm);
+    this.testString = wasm.test_string.bind(wasm);
     //this.getTile = wasm.get_tile;
     this.worldgen = new Worldgen(this);
     this.worldlogic = new Worldlogic(this);
@@ -79,12 +75,6 @@ class World {
       return true;
     }
   }
-
-  // checkTile(x, y, mask) {
-  //   // why is tile undefined sometimes???
-  //   const maskJson = JSON.stringify(mask);
-  //   return this.checkTileWasm(x, y, maskJson);
-  // }
 
   checkChunks(x, y, mask, distance = 0, threshold = 1) {
     if (!this._legal(x, y)) return false;

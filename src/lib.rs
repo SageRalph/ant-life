@@ -1,3 +1,5 @@
+extern crate console_error_panic_hook;
+use std::panic;
 use wasm_bindgen::prelude::*;
 use web_sys::console;
 
@@ -13,28 +15,58 @@ pub struct World {
 #[wasm_bindgen]
 impl World {
     pub fn new(rows: i32, cols: i32) -> World {
-        console::log_1(&format!("hello we are getting this far").into());
+        panic::set_hook(Box::new(console_error_panic_hook::hook));
         let tiles = vec![vec![String::from(" "); cols as usize]; rows as usize];
         World { rows, cols, tiles }
     }
 
     pub fn test_string(&self, s: &str) {
+        panic::set_hook(Box::new(console_error_panic_hook::hook));
         console::log_1(&s.into());
     }
 
     pub fn set_tiles(&mut self, tiles_str: &str) {
-        self.tiles = serde_json::from_str(tiles_str).unwrap();
+        panic::set_hook(Box::new(console_error_panic_hook::hook));
+        console::log_1(&tiles_str.into());
+        let tiles: Result<Vec<Vec<String>>, _> = serde_json::from_str(tiles_str);
+        match tiles {
+            Ok(v) => {
+                // do something with v
+            },
+            Err(e) => {
+                // handle error here
+                println!("Error parsing JSON: {}", e);
+            }
+        }
+    }
+
+    pub fn push_tile_row(&mut self, tile_row_str: &str) {
+        panic::set_hook(Box::new(console_error_panic_hook::hook));
+        let tile_row: Result<Vec<String>, _> = serde_json::from_str(tile_row_str);
+
+        match tile_row {
+            Ok(v) => {
+                // do something with v
+                self.tiles.push(v);
+            },
+            Err (e) => {
+                println!("Error parsing JSON: {}", e);
+            }
+        }
     }
 
     pub fn get_tile(&self, x: i32, y: i32) -> String {
+        panic::set_hook(Box::new(console_error_panic_hook::hook));
         self.tiles[y as usize][x as usize].clone()
     }
 
     pub fn legal(&self, x: i32, y: i32) -> bool {
+        panic::set_hook(Box::new(console_error_panic_hook::hook));
         x >= 0 && y >= 0 && x < self.cols && y < self.rows
     }
 
     pub fn check_tile(&self, x: i32, y: i32, mask_json: &str) -> bool {
+        panic::set_hook(Box::new(console_error_panic_hook::hook));
         if !self.legal(x, y) {
             return false;
         }
