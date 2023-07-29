@@ -12,10 +12,8 @@ let LAST_ANT_COUNT = 1;
 
 $(document).ready(async function () {
   console.log('hello from document ready')
-  initAntlife();
+  await initAntlife();
   setupControls();
-  const { default: init } = await import('../pkg/ant_life_optimised.js');
-  await init();
   if (!START_PAUSED) {
     $("#btn-pause").trigger("click");
   }
@@ -106,9 +104,12 @@ function _setBrushMask() {
   }
 }
 
-function initAntlife() {
+async function initAntlife() {
   if (DEBUG) console.log("Loading...");
   $("#score").text("");
+  const wasm = await import("../pkg/ant_life_optimised.js");
+  window.WASM = wasm
+  await WASM.default(); // default function is wasm init
   WORLD = new World();
   RENDERER = new Renderer(document.getElementById("map"), WORLD, TILESET);
   RENDERER.draw();

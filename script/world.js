@@ -1,6 +1,20 @@
 
 class World {
   constructor(rows = ROW_COUNT, cols = COL_COUNT, generatorSettings = {}) {
+    this.wasmWorld = new WASM.World();
+    console.log('hello world');
+    console.log(this.wasmWorld);
+    // is legal available without new World because no ref to self in Rust?
+    this._legal = WASM.World.legal; 
+    this.setRows = this.wasmWorld.set_rows;
+    this.getRows = this.wasmWorld.get_rows;
+    this.setCols = this.wasmWorld.set_cols;
+    this.getCols = this.wasmWorld.get_rows;
+    this.getAge = this.wasmWorld.get_age.bind(this.wasmWorld);
+    this.setAge = this.wasmWorld.set_age.bind(this.wasmWorld);
+    this.setAnts = this.wasmWorld.set_ants;
+    this.getAnts = this.wasmWorld.get_ants;
+    this.print = this.wasmWorld.print.bind(this.wasmWorld);
     this.rows = rows;
     this.cols = cols;
     this.age = 0;
@@ -9,6 +23,7 @@ class World {
     this.worldgen = new Worldgen(this);
     this.worldlogic = new Worldlogic(this);
     this.worldgen.generate(generatorSettings);
+    console.log('----------------end of constructor----------------')
   }
 
   tick() {
@@ -176,15 +191,6 @@ class World {
     });
   }
 
-
-  async _legal(x, y) {
-    if (!this.legalFunction) {
-      const { legal } = await import('../pkg/ant_life_optimised.js');
-      this.legalFunction = legal;
-    }
-
-    return await this.legalFunction(this.rows, this.cols, x, y);
-  }
 
   benchmark() {
     const durations = {};
