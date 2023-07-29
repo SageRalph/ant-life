@@ -10,15 +10,12 @@ let BRUSH_X;
 let BRUSH_Y;
 let LAST_ANT_COUNT = 1;
 
-function waitTenSeconds() {
-    return new Promise(resolve => {
-        setTimeout(resolve, 10000);  // 10000 milliseconds = 10 seconds
-    });
-}
-
 $(document).ready(async function () {
-  await initAntlife();
+  console.log('hello from document ready')
+  initAntlife();
   setupControls();
+  const { default: init } = await import('../pkg/ant_life_optimised.js');
+  await init();
   if (!START_PAUSED) {
     $("#btn-pause").trigger("click");
   }
@@ -27,11 +24,8 @@ $(document).ready(async function () {
 /**
  * Benchmark simulation performance
  */
-async function benchmark() {
-  const wasm = await import('../pkg/ant_life_optimised.js');
-  await wasm.default(); // default function is init
-
-  return new World(wasm).benchmark();
+function benchmark() {
+  return new World().benchmark();
 }
 
 /**
@@ -49,7 +43,6 @@ function pause() {
  * Run the simulation
  */
 function play() {
-  console.log('hello from play');
   $("#btn-pause").text("Pause");
   gameLoop();
 }
@@ -113,14 +106,10 @@ function _setBrushMask() {
   }
 }
 
-async function initAntlife() {
-  const wasm = await import('../pkg/ant_life_optimised.js');
-  await wasm.default(); // default function is init
-  const wasmWorld = wasm.World.new(ROW_COUNT, COL_COUNT);
-
+function initAntlife() {
   if (DEBUG) console.log("Loading...");
   $("#score").text("");
-  WORLD = new World(wasmWorld);
+  WORLD = new World();
   RENDERER = new Renderer(document.getElementById("map"), WORLD, TILESET);
   RENDERER.draw();
   prompt(`

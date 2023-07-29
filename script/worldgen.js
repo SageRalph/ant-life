@@ -16,7 +16,6 @@ class Worldgen {
         let tile = mask[randomIntInclusive(0, mask.length - 1)];
         row.push(tile);
       }
-      console.log(row);
       this.world.tiles.push(row);
     }
   }
@@ -59,10 +58,9 @@ class Worldgen {
       for (let x = 0; x < this.world.cols; x++) {
         // Default to SOIL underground and AIR above
         let tile = y < surfaceY ? "SOIL" : "AIR";
-        this.world.tiles.push(tile);
+        row.push(tile);
       }
       this.world.tiles.push(row);
-      // this.world.pushTileRow(row)
     }
 
     // Sand

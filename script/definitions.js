@@ -4,7 +4,7 @@ let BENCHMARK_BATCHES = 10;
 let BENCHMARK_DENSITY = 0.05;
 
 const TPS = 30;
-const START_PAUSED = true;
+const START_PAUSED = false;
 
 const TILESET = {
   AIR: "skyblue",

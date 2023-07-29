@@ -1,5 +1,0 @@
-{
-  "watch": ["src"],
-  "ext": "rs",
-  "exec": "wasm-pack build --target web"
-}

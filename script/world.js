@@ -1,33 +1,14 @@
+
 class World {
-  constructor(wasm, rows = ROW_COUNT, cols = COL_COUNT, generatorSettings = {}) {
+  constructor(rows = ROW_COUNT, cols = COL_COUNT, generatorSettings = {}) {
     this.rows = rows;
     this.cols = cols;
     this.age = 0;
     this.ants = 1;
     this.generatorSettings = generatorSettings;
-    // this._legal = wasm.legal;
-    // this.checkTileWasm = wasm.check_tile;
-    this.setTiles = wasm.set_tiles.bind(wasm);
-    this.pushTileRow = wasm.push_tile_row.bind(wasm);
-    this.testString = wasm.test_string.bind(wasm);
-    //this.getTile = wasm.get_tile;
     this.worldgen = new Worldgen(this);
     this.worldlogic = new Worldlogic(this);
-    this.worldgen.generate(this.generatorSettings);
-  }
-
-  checkTile(x, y, mask) {
-    if (!this._legal(x, y)) return false;
-    if (!mask) return true;
-    return mask.includes(this.getTile(x, y));
-  }
-
-  getTile(x, y) {
-    return this.tiles[y][x];
-  }
-
-  _legal(x, y) {
-    return x >= 0 && y >= 0 && x < this.cols && y < this.rows;
+    this.worldgen.generate(generatorSettings);
   }
 
   tick() {
@@ -67,6 +48,10 @@ class World {
     }
   }
 
+  getTile(x, y) {
+    return this.tiles[y][x];
+  }
+
   setTile(x, y, tile, mask = false) {
     if (!this.checkTile(x, y, mask)) {
       return false;
@@ -74,6 +59,12 @@ class World {
       this.tiles[y][x] = tile;
       return true;
     }
+  }
+
+  checkTile(x, y, mask) {
+    if (!this._legal(x, y)) return false;
+    if (!mask) return true;
+    return mask.includes(this.getTile(x, y));
   }
 
   checkChunks(x, y, mask, distance = 0, threshold = 1) {
@@ -183,6 +174,16 @@ class World {
       if (mask.length && !me.checkTile(x, y, mask)) return;
       me.setTile(x, y, tile);
     });
+  }
+
+
+  async _legal(x, y) {
+    if (!this.legalFunction) {
+      const { legal } = await import('../pkg/ant_life_optimised.js');
+      this.legalFunction = legal;
+    }
+
+    return await this.legalFunction(this.rows, this.cols, x, y);
   }
 
   benchmark() {
