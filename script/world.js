@@ -1,19 +1,25 @@
 
 class World {
   constructor(rows = ROW_COUNT, cols = COL_COUNT, generatorSettings = {}) {
-    this.wasmWorld = new WASM.World();
+    const age = 0;
+    const ants = 0;
+    this.wasmWorld = new WASM.World(rows, cols, age, ants);
     console.log('hello world');
     console.log(this.wasmWorld);
     // is legal available without new World because no ref to self in Rust?
     this._legal = WASM.World.legal; 
-    this.setRows = this.wasmWorld.set_rows;
-    this.getRows = this.wasmWorld.get_rows;
-    this.setCols = this.wasmWorld.set_cols;
-    this.getCols = this.wasmWorld.get_rows;
+    this.setRows = this.wasmWorld.set_rows.bind(this.wasmWorld);
+    this.getRows = this.wasmWorld.get_rows.bind(this.wasmWorld);
+    this.setCols = this.wasmWorld.set_cols.bind(this.wasmWorld);
+    this.getCols = this.wasmWorld.get_rows.bind(this.wasmWorld);
     this.getAge = this.wasmWorld.get_age.bind(this.wasmWorld);
     this.setAge = this.wasmWorld.set_age.bind(this.wasmWorld);
-    this.setAnts = this.wasmWorld.set_ants;
-    this.getAnts = this.wasmWorld.get_ants;
+    this.setAnts = this.wasmWorld.set_ants.bind(this.wasmWorld);
+    this.getAnts = this.wasmWorld.get_ants.bind(this.wasmWorld);
+    this.setTiles = this.wasmWorld.set_tiles.bind(this.wasmWorld);
+    this.getTiles = this.wasmWorld.get_tiles.bind(this.wasmWorld);
+    // this.getTile = this.wasmWorld.get_tile.bind(this.wasmWorld);
+    this.setTile = this.wasmWorld.set_tile.bind(this.wasmWorld);
     this.print = this.wasmWorld.print.bind(this.wasmWorld);
     this.rows = rows;
     this.cols = cols;
@@ -24,6 +30,10 @@ class World {
     this.worldlogic = new Worldlogic(this);
     this.worldgen.generate(generatorSettings);
     console.log('----------------end of constructor----------------')
+  }
+
+  getTile(x, y) {
+    return this.tiles[y][x];
   }
 
   tick() {
@@ -61,10 +71,6 @@ class World {
       const x = randomIntInclusive(0, this.cols - 1);
       this.setTile(x, this.rows - 1, tile, ["AIR"]);
     }
-  }
-
-  getTile(x, y) {
-    return this.tiles[y][x];
   }
 
   setTile(x, y, tile, mask = false) {

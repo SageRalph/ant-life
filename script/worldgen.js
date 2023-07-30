@@ -46,10 +46,7 @@ class Worldgen {
     noiseMaxSize = 6,
   }) {
     this.world.age = 0;
-    console.log('setting age');
-    this.world.setAge(1);
-    console.log('getting age')
-    console.log(this.world.getAge())
+    this.world.setAge(0);
 
     const surfaceY = Math.round(this.world.rows * (1 - skyProp));
     this.world.surfaceY = surfaceY;
@@ -64,10 +61,9 @@ class Worldgen {
         let tile = y < surfaceY ? "SOIL" : "AIR";
         row.push(tile);
       }
-      console.log(row.length);
       this.world.tiles.push(row);
     }
-    console.log(this.world.tiles.length)
+    this.world.setTiles(JSON.stringify(this.world.tiles));
 
     // Sand
     this._generatePatches(
