@@ -7,7 +7,7 @@ class World {
     console.log('hello world');
     console.log(this.wasmWorld);
     // is legal available without new World because no ref to self in Rust?
-    this._legal = WASM.World.legal; 
+    this._legal = this.wasmWorld.legal.bind(this.wasmWorld);
     this.setRows = this.wasmWorld.set_rows.bind(this.wasmWorld);
     this.getRows = this.wasmWorld.get_rows.bind(this.wasmWorld);
     this.setCols = this.wasmWorld.set_cols.bind(this.wasmWorld);
@@ -18,8 +18,8 @@ class World {
     this.getAnts = this.wasmWorld.get_ants.bind(this.wasmWorld);
     this.setTiles = this.wasmWorld.set_tiles.bind(this.wasmWorld);
     this.getTiles = this.wasmWorld.get_tiles.bind(this.wasmWorld);
-    // this.getTile = this.wasmWorld.get_tile.bind(this.wasmWorld);
-    this.setTile = this.wasmWorld.set_tile.bind(this.wasmWorld);
+    this.getTile = this.wasmWorld.get_tile.bind(this.wasmWorld);
+    // this.setTile = this.wasmWorld.set_tile.bind(this.wasmWorld);
     this.print = this.wasmWorld.print.bind(this.wasmWorld);
     this.rows = rows;
     this.cols = cols;
@@ -32,9 +32,9 @@ class World {
     console.log('----------------end of constructor----------------')
   }
 
-  getTile(x, y) {
-    return this.tiles[y][x];
-  }
+  // getTile(x, y) {
+  //   return this.tiles[y][x];
+  // }
 
   tick() {
     this._updateChunks();

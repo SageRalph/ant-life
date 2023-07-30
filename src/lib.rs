@@ -111,12 +111,38 @@ impl World {
         }
     }
 
-//   getTile(x, y) {
-//     return this.tiles[y][x];
-//   }
+    pub fn set_tile(&self, x: i32, y: i32, tile: &str, mask_str: &str) -> Result<(), String> { 
+        panic::set_hook(Box::new(console_error_panic_hook::hook));
+        let tile_str: Result<String, _> = serde_json::to_string(&self.tiles[y as usize][x as usize]);
+        match tile_str {
+            Ok(v) => {
+                Ok(()) // TODO set tile
+            }
+            Err(e) => Err(format!("Error parsing JSON: {}", e)),
+        }
+    }
 
     // functions
-    pub fn legal(rows: i32, cols: i32, x: i32, y: i32) -> bool {
-        x >= 0 && y >= 0 && x < cols && y < rows
+    pub fn legal(&self, x: i32, y: i32) -> bool {
+        x >= 0 && y >= 0 && x < self.cols && y < self.rows
     }
+
+    // pub fn check_tile(&self, x: i32, y: i32, mask_str: &str) -> bool {
+    //     // if self.legal returns false then return true
+    //     if (&self.legal(x, y)) {
+    //         return true;
+    //     }
+    //     return false;
+
+        // let mask = serde_json::from_str(mask_str);
+        // match mask {
+        //     Ok(m) => {
+        //         return true;
+        //     }
+        //     Err(e) => {
+        //         web_sys::console::error_1(&e.into());
+        //         return false;
+        //     }
+        // }
+    // }
 }
