@@ -1,4 +1,5 @@
 extern crate console_error_panic_hook;
+use rand::Rng;
 use std::panic;
 use wasm_bindgen::prelude::*;
 use web_sys::console;
@@ -113,6 +114,25 @@ impl World {
         }
     }
 
+    pub fn set_tile(&mut self, x: i32, y: i32, tile: &str, mask_str: Option<String>) -> bool {
+        if !self.legal(x, y) {
+            return false;
+        }
+
+        if let Some(mask) = &mask_str {
+            if !self.check_tile(x, y, Some(mask.clone())) {
+                return false;
+            }
+        } else {
+            if !self.check_tile(x, y, None) {
+                return false;
+            }
+        }
+        
+        self.tiles[y as usize][x as usize] = tile.to_string();
+        true
+    }
+
     pub fn get_tiles(&self) -> Result<String, String> {
         panic::set_hook(Box::new(console_error_panic_hook::hook));
         let tiles_str: Result<String, _> = serde_json::to_string(&self.tiles);
@@ -137,28 +157,29 @@ impl World {
     }
 
     // functions
+    pub fn do_rain(&mut self, count: f64, tile: Option<String>) {
+        let tile = tile.unwrap_or("WATER".to_string());
+        
+        let mut real_count = count.floor() as i32;
+        
+        let mut rng = rand::thread_rng();
+        if rng.gen::<f64>() <= count {
+            real_count += 1;
+        }
+
+        for _ in 0..real_count {
+            let x = rng.gen_range(0..self.cols);
+            self.set_tile(x, self.rows - 1, &tile, Some(String::from("AIR")));
+        }
+    }
+
     pub fn legal(&self, x: i32, y: i32) -> bool {
         panic::set_hook(Box::new(console_error_panic_hook::hook));
         x >= 0 && y >= 0 && x < self.cols && y < self.rows
     }
 
-    // pub fn set_tile(&self, x: i32, y: i32, tile: &str, mask_str: &str) -> Result<(), String> { 
-    //     let tile_str: Result<String, _> = serde_json::to_string(&self.tiles[y as usize][x as usize]);
-    //     match tile_str {
-    //         Ok(v) => {
-    //             Ok(()) // TODO set tile
-    //         }
-    //         Err(e) => Err(format!("Error parsing JSON: {}", e)),
-    //     }
-    // }
-
-
     pub fn check_tile(&self, x: i32, y: i32, mask_str: Option<String>) -> bool {
         panic::set_hook(Box::new(console_error_panic_hook::hook));
-        if !self.legal(x, y) {
-            return false;
-        } 
-
         match mask_str {
             Some(mask_json) => {
                 let mask: Result<Vec<String>, _> = serde_json::from_str(&mask_json);

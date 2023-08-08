@@ -21,8 +21,9 @@ class World {
     this.getTile = this.wasmWorld.get_tile.bind(this.wasmWorld);
     this.checkTile = this.wasmWorld.check_tile.bind(this.wasmWorld);
     this.print = this.wasmWorld.print.bind(this.wasmWorld);
-    // this.setTile = this.wasmWorld.set_tile.bind(this.wasmWorld);
+    this.setTile = this.wasmWorld.set_tile.bind(this.wasmWorld);
     this.print = this.wasmWorld.print.bind(this.wasmWorld);
+    this.doRain = this.wasmWorld.do_rain.bind(this.wasmWorld);
     this.rows = rows;
     this.cols = cols;
     this.age = 0;
@@ -31,21 +32,8 @@ class World {
     this.worldgen = new Worldgen(this);
     this.worldlogic = new Worldlogic(this);
     this.worldgen.generate(generatorSettings);
-    this.print('hello from rust print');
-    console.log('ahh');
     console.log('----------------end of constructor----------------')
   }
-
-  // getTile(x, y) {
-  //   return this.tiles[y][x];
-  // }
-
-
-  // checkTile(x, y, mask) {
-  //   if (!this._legal(x, y)) return false;
-  //   if (!mask) return true;
-  //   return mask.includes(this.getTile(x, y));
-  // }
 
   tick() {
     this._updateChunks();
@@ -69,27 +57,6 @@ class World {
     } // Pests (never at same time as rain)
     else if (this.age >= PEST_START && this.age % PEST_FREQ === 0) {
       this.doRain(Math.random(), "PEST");
-    }
-  }
-
-  doRain(count, tile = "WATER") {
-    // allow for non-int chance
-    let realCount = Math.floor(count);
-    if (Math.random() <= count % 1) {
-      realCount++;
-    }
-    for (let i = 0; i < realCount; i++) {
-      const x = randomIntInclusive(0, this.cols - 1);
-      this.setTile(x, this.rows - 1, tile, ["AIR"]);
-    }
-  }
-
-  setTile(x, y, tile, mask = false) {
-    if (!this.checkTile(x, y, JSON.stringify(mask))) {
-      return false;
-    } else {
-      this.tiles[y][x] = tile;
-      return true;
     }
   }
 
