@@ -17,9 +17,7 @@ class World {
     this.getTiles = this.wasmWorld.get_tiles.bind(this.wasmWorld);
     this.getTile = this.wasmWorld.get_tile.bind(this.wasmWorld);
     this.checkTile = this.wasmWorld.check_tile.bind(this.wasmWorld);
-    this.print = this.wasmWorld.print.bind(this.wasmWorld);
     this.setTile = this.wasmWorld.set_tile.bind(this.wasmWorld);
-    this.print = this.wasmWorld.print.bind(this.wasmWorld);
     this.doRain = this.wasmWorld.do_rain.bind(this.wasmWorld);
     this.rows = rows;
     this.cols = cols;

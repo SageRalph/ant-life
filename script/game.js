@@ -11,7 +11,6 @@ let BRUSH_Y;
 let LAST_ANT_COUNT = 1;
 
 $(document).ready(async function () {
-  console.log('hello from document ready')
   await init();
   setupControls();
   if (!START_PAUSED) {
