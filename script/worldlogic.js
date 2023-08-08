@@ -80,6 +80,7 @@ class Worldlogic {
         this.world.checkTile(x + 1, y, ["AIR"]) ||
         this._touching(x, y, ["PLANT"]))
     ) {
+
       return this.world.setTile(x, y, "AIR");
     }
 

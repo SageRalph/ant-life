@@ -110,6 +110,7 @@ async function initAntlife() {
   const wasm = await import("../pkg/ant_life_optimised.js");
   window.WASM = wasm
   await WASM.default(); // default function is wasm init
+  await WASM.init_panic_hook();
   WORLD = new World();
   RENDERER = new Renderer(document.getElementById("map"), WORLD, TILESET);
   RENDERER.draw();

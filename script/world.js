@@ -19,6 +19,8 @@ class World {
     this.setTiles = this.wasmWorld.set_tiles.bind(this.wasmWorld);
     this.getTiles = this.wasmWorld.get_tiles.bind(this.wasmWorld);
     this.getTile = this.wasmWorld.get_tile.bind(this.wasmWorld);
+    this.checkTile = this.wasmWorld.check_tile.bind(this.wasmWorld);
+    this.print = this.wasmWorld.print.bind(this.wasmWorld);
     // this.setTile = this.wasmWorld.set_tile.bind(this.wasmWorld);
     this.print = this.wasmWorld.print.bind(this.wasmWorld);
     this.rows = rows;
@@ -29,11 +31,20 @@ class World {
     this.worldgen = new Worldgen(this);
     this.worldlogic = new Worldlogic(this);
     this.worldgen.generate(generatorSettings);
+    this.print('hello from rust print');
+    console.log('ahh');
     console.log('----------------end of constructor----------------')
   }
 
   // getTile(x, y) {
   //   return this.tiles[y][x];
+  // }
+
+
+  // checkTile(x, y, mask) {
+  //   if (!this._legal(x, y)) return false;
+  //   if (!mask) return true;
+  //   return mask.includes(this.getTile(x, y));
   // }
 
   tick() {
@@ -80,12 +91,6 @@ class World {
       this.tiles[y][x] = tile;
       return true;
     }
-  }
-
-  checkTile(x, y, mask) {
-    if (!this._legal(x, y)) return false;
-    if (!mask) return true;
-    return mask.includes(this.getTile(x, y));
   }
 
   checkChunks(x, y, mask, distance = 0, threshold = 1) {
