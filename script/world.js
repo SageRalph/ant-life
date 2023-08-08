@@ -4,9 +4,6 @@ class World {
     const age = 0;
     const ants = 0;
     this.wasmWorld = new WASM.World(rows, cols, age, ants);
-    console.log('hello world');
-    console.log(this.wasmWorld);
-    // is legal available without new World because no ref to self in Rust?
     this._legal = this.wasmWorld.legal.bind(this.wasmWorld);
     this.setRows = this.wasmWorld.set_rows.bind(this.wasmWorld);
     this.getRows = this.wasmWorld.get_rows.bind(this.wasmWorld);
@@ -32,7 +29,6 @@ class World {
     this.worldgen = new Worldgen(this);
     this.worldlogic = new Worldlogic(this);
     this.worldgen.generate(generatorSettings);
-    console.log('----------------end of constructor----------------')
   }
 
   tick() {

@@ -15,28 +15,13 @@ pub struct World {
 
 #[wasm_bindgen]
 impl World {
-    // sanity checker
-    pub fn print(&self, s: String) {
-        console::log_1(&format!("{}", s).into());
-    }
-
     // constructor
     #[wasm_bindgen(constructor)]
     pub fn constructor(rows: i32, cols: i32, age: i32, ants: i32) -> Self {
         panic::set_hook(Box::new(console_error_panic_hook::hook));
 
         let tiles = vec![vec![String::from(""); cols as usize]; rows as usize];
-
-        console::log_1(&format!("constructor fired").into());
-        console::log_1(&format!("Provided rows: {}, cols: {}", rows, cols).into());
-        console::log_1(&format!("Actual tiles length (rows): {}", tiles.len()).into());
-
-        for (index, row) in tiles.iter().enumerate() {
-            if row.len() != cols as usize {
-                console::log_1(&format!("Row {} has incorrect length: {}", index, row.len()).into());
-            }
-        }
-
+        console::log_1(&format!("WASM World constructor fired").into());
         World {
             rows,
             cols,
