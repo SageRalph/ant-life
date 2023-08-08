@@ -3,8 +3,8 @@ let BENCHMARK_TICKS = 100; // Number of simulation steps to run the benchmark fo
 let BENCHMARK_BATCHES = 10; // Benchmarks are averaged over this many runs
 let BENCHMARK_DENSITY = 0.05; // Proportion of tiles that are not air in benchmark worlds, this ensures tiles can move around
 
-const TPS = 30; // Game speed in (max) ticks per second
-const START_PAUSED = false;
+const TPS = 30;
+const START_PAUSED = true;
 
 const TILESET = {
   AIR: "skyblue",
@@ -78,3 +78,44 @@ const WATER_KILL_MASK = ["WORKER", "QUEEN", "EGG", "PEST"];
 
 // Tiles workers can push when they move
 const PUSH_MASK = ["PLANT", "CORPSE"];
+
+// module exports all variables
+if (typeof module === 'object') {
+  module.exports = {
+    DEBUG,
+    BENCHMARK_TICKS,
+    BENCHMARK_BATCHES,
+    BENCHMARK_DENSITY,
+    TPS,
+    START_PAUSED,
+    TILESET,
+    PAINTABLE_MASK,
+    ROW_COUNT,
+    COL_COUNT,
+    CHUNK_SIZE,
+    RAIN_FREQ,
+    RAIN_TIME,
+    PEST_FREQ,
+    PEST_START,
+    KILL_PROB,
+    EVAPORATE_PROB,
+    CONVERT_PROB,
+    GROW_PROB,
+    EGG_LAY_PROB,
+    EGG_HATCH_PROB,
+    EGG_QUEEN_PROB,
+    QUEEN_SPEED,
+    QUEEN_RANGE,
+    QUEEN_FUNGUS_MIN,
+    PEST_SEEK_PROB,
+    PEST_RANGE,
+    WORKER_RANGE,
+    CLIMB_MASK,
+    WALK_MASK,
+    ROAM_MASK,
+    PLANT_GROW_MASK,
+    PEST_TARGET_MASK,
+    WATER_KILL_MASK,
+    PUSH_MASK
+  };
+}

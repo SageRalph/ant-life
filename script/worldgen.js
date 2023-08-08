@@ -83,6 +83,7 @@ class Worldgen {
     noiseMaxSize = 6,
   }) {
     this.world.age = 0;
+    this.world.setAge(0);
 
     const surfaceY = Math.round(this.world.rows * (1 - skyProp));
     this.world.surfaceY = surfaceY;
@@ -99,6 +100,7 @@ class Worldgen {
       }
       this.world.tiles.push(row);
     }
+    this.world.setTiles(JSON.stringify(this.world.tiles));
 
     // Sand
     this._generatePatches(
@@ -238,8 +240,12 @@ class Worldgen {
    */
   _findSurfaceY(x) {
     for (let y = this.world.rows - 1; y >= 0; y--) {
-      if (!this.world.checkTile(x, y, ["AIR", "WATER"])) return y;
+      if (!this.world.checkTile(x, y, JSON.stringify(["AIR", "WATER"]))) return y;
     }
     return 0;
   }
+}
+
+if (typeof module === 'object') {
+  module.exports = { Worldgen };
 }

@@ -8,6 +8,24 @@
  */
 class World {
   constructor(rows = ROW_COUNT, cols = COL_COUNT, generatorSettings = {}) {
+    const age = 0;
+    const ants = 0;
+    this.wasmWorld = new WASM.World(rows, cols, age, ants);
+    this._legal = this.wasmWorld.legal.bind(this.wasmWorld);
+    this.setRows = this.wasmWorld.set_rows.bind(this.wasmWorld);
+    this.getRows = this.wasmWorld.get_rows.bind(this.wasmWorld);
+    this.setCols = this.wasmWorld.set_cols.bind(this.wasmWorld);
+    this.getCols = this.wasmWorld.get_rows.bind(this.wasmWorld);
+    this.getAge = this.wasmWorld.get_age.bind(this.wasmWorld);
+    this.setAge = this.wasmWorld.set_age.bind(this.wasmWorld);
+    this.setAnts = this.wasmWorld.set_ants.bind(this.wasmWorld);
+    this.getAnts = this.wasmWorld.get_ants.bind(this.wasmWorld);
+    this.setTiles = this.wasmWorld.set_tiles.bind(this.wasmWorld);
+    this.getTiles = this.wasmWorld.get_tiles.bind(this.wasmWorld);
+    this.getTile = this.wasmWorld.get_tile.bind(this.wasmWorld);
+    this.checkTile = this.wasmWorld.check_tile.bind(this.wasmWorld);
+    this.setTile = this.wasmWorld.set_tile.bind(this.wasmWorld);
+    this.doRain = this.wasmWorld.do_rain.bind(this.wasmWorld);
     this.rows = rows;
     this.cols = cols;
     this.age = 0;
@@ -46,72 +64,6 @@ class World {
     }
   }
 
-  /**
-   * Spawn tiles at random locations on the top row
-   * @param {number} count - number of tiles to spawn
-   * @param {string} tile - tile type to spawn
-   */
-  doRain(count, tile = "WATER") {
-    // allow for non-int chance
-    let realCount = Math.floor(count);
-    if (Math.random() <= count % 1) {
-      realCount++;
-    }
-    for (let i = 0; i < realCount; i++) {
-      const x = randomIntInclusive(0, this.cols - 1);
-      this.setTile(x, this.rows - 1, tile, ["AIR"]);
-    }
-  }
-
-  /**
-   * Returns the tile at the given coordinates
-   * @param {number} x - x coordinate
-   * @param {number} y - y coordinate
-   */
-  getTile(x, y) {
-    return this.tiles[y][x];
-  }
-
-  /**
-   * Replaces the tile at the given coordinates
-   * If set, mask will only allow the tile to be set if it is in the mask
-   * @param {number} x - x coordinate
-   * @param {number} y - y coordinate
-   * @param {string} tile - tile type to set
-   * @param {string[]} mask - tile types that are allowed to be replaced
-   * @returns {boolean} - whether the tile was set
-   */
-  setTile(x, y, tile, mask = false) {
-    if (!this.checkTile(x, y, mask)) {
-      return false;
-    } else {
-      this.tiles[y][x] = tile;
-      return true;
-    }
-  }
-
-  /**
-   * Returns whether a tile is legal and optionally whether it is in the mask
-   * @param {number} x - x coordinate
-   * @param {number} y - y coordinate
-   * @param {string[]} mask - tile types that are allowed
-   * @returns {boolean} - whether the tile is legal and allowed by the mask
-   */
-  checkTile(x, y, mask) {
-    if (!this._legal(x, y)) return false;
-    if (!mask) return true;
-    return mask.includes(this.getTile(x, y));
-  }
-
-  /**
-   * Returns whether chunks within a given distance of a tile contain a tile in the mask
-   * @param {number} x - x coordinate
-   * @param {number} y - y coordinate
-   * @param {string[]} mask - tile types that are counted
-   * @param {number} distance - distance from tile to check
-   * @param {number} threshold - number of tiles in mask required to return true
-   * @returns {boolean} - whether the chunks contain the required number of tiles
-   */
   checkChunks(x, y, mask, distance = 0, threshold = 1) {
     if (!this._legal(x, y)) return false;
     if (!mask) return true;
@@ -198,7 +150,7 @@ class World {
    * @returns {boolean} - whether the tiles were swapped
    */
   swapTiles(x, y, a, b, mask = false) {
-    if (!this.checkTile(a, b, mask)) {
+    if (!this.checkTile(a, b, JSON.stringify(mask))) {
       return false;
     } else {
       const t1 = this.getTile(x, y);
@@ -241,7 +193,7 @@ class World {
       centerX + radius,
       centerY + radius,
       function (x, y) {
-        if (mask.length && !me.checkTile(x, y, mask)) return;
+        if (mask.length && !me.checkTile(x, y, JSON.stringify(mask))) return;
         if (!pointWithinRadius(centerX, centerY, x, y, radius)) return;
         me.setTile(x, y, tile);
       },
@@ -260,16 +212,9 @@ class World {
   fillRectangle(minX, minY, maxX, maxY, tile, mask = []) {
     const me = this;
     this.forEachTile(minX, minY, maxX, maxY, function (x, y) {
-      if (mask.length && !me.checkTile(x, y, mask)) return;
+      if (mask.length && !me.checkTile(x, y, JSON.stringify(mask))) return;
       me.setTile(x, y, tile);
     });
-  }
-
-  /**
-   * Returns whether a pair of coordinates is within the bounds of the map
-   */
-  _legal(x, y) {
-    return x >= 0 && y >= 0 && x < this.cols && y < this.rows;
   }
 
   /**
@@ -327,4 +272,8 @@ class World {
     }
     return Math.round(1000 / average(batches));
   }
+}
+
+if (typeof module === 'object') {
+  module.exports = { World };
 }

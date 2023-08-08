@@ -10,8 +10,8 @@ let BRUSH_X;
 let BRUSH_Y;
 let LAST_ANT_COUNT = 1;
 
-$(document).ready(function () {
-  init();
+$(document).ready(async function () {
+  await init();
   setupControls();
   if (!START_PAUSED) {
     $("#btn-pause").trigger("click");
@@ -116,9 +116,15 @@ function _setBrushMask() {
   }
 }
 
-function init() {
+async function init() {
   if (DEBUG) console.log("Loading...");
   $("#score").text("");
+
+  // init wasm and make wasm object global
+  window.WASM = await import("../pkg/ant_life_optimised.js");
+  await WASM.default(); // default function is wasm init
+
+  // start world
   WORLD = new World();
   RENDERER = new Renderer(document.getElementById("map"), WORLD, TILESET);
   RENDERER.draw();
