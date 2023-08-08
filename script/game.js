@@ -95,6 +95,19 @@ function _setPointerLocation(e) {
 }
 
 function _setBrushMask() {
+  // Starting brushing from outside the map will only paint over AIR
+  if (
+    BRUSH_X < 0 ||
+    BRUSH_X >= WORLD.cols ||
+    BRUSH_Y < 0 ||
+    BRUSH_Y >= WORLD.rows
+  ) {
+    BRUSH_MASK = "AIR";
+    return;
+  }
+
+  // Brush will only paint over tiles of the same type as the first tile clicked
+  // If the first tile clicked is not paintable, the brush will only paint over AIR
   const tile = WORLD.getTile(BRUSH_X, BRUSH_Y);
   if (PAINTABLE_MASK.includes(tile)) {
     BRUSH_MASK = tile;
@@ -180,6 +193,14 @@ function gameLoop(loop = true) {
 
 function doInput(draw = true) {
   if (!BRUSH_ON) return;
+  if (
+    BRUSH_X < 0 ||
+    BRUSH_X >= WORLD.cols ||
+    BRUSH_Y < 0 ||
+    BRUSH_Y >= WORLD.rows
+  ) {
+    return;
+  }
   const brushSize = Math.round($("#brush-size").val());
   const brushMat = $("#brush-mat").val();
   WORLD.fillCircle(BRUSH_X, BRUSH_Y, brushSize, brushMat, BRUSH_MASK);

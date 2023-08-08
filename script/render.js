@@ -4,11 +4,22 @@ class Renderer {
     this.world = world;
     this.tileset = tileset;
     this._ctx = canvas.getContext("2d", { alpha: false });
-    this._cw = canvas.width / world.cols;
-    this._ch = canvas.height / world.rows;
+    // Ensure tiles are square
+    this._tileSize = Math.min(
+      canvas.width / world.cols,
+      canvas.height / world.rows,
+    );
+    // Center the world (letterbox if not square)
+    this._xOffset = (canvas.width - this._tileSize * world.cols) / 2;
+    this._yOffset = (canvas.height - this._tileSize * world.rows) / 2;
     this.fillStyle = "AIR";
+    // Clear canvas
+    this._ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
 
+  /**
+   * Draw the current world state. Optimised to only draw changed tiles.
+   */
   draw() {
     /// loop through rows and columns
     for (let y = 0; y < this.world.rows; y++) {
@@ -27,10 +38,10 @@ class Renderer {
 
         // Draw tile
         this._ctx.fillRect(
-          x * this._cw,
-          this.canvas.height - y * this._ch,
-          this._cw,
-          -this._ch,
+          this._xOffset + x * this._tileSize,
+          this._yOffset + (this.world.rows - y - 1) * this._tileSize,
+          this._tileSize,
+          this._tileSize,
         );
       }
     }
@@ -38,15 +49,21 @@ class Renderer {
     this.oldTiles = JSON.parse(JSON.stringify(this.world.tiles));
   }
 
+  /**
+   * Convert canvas coordinates to world coordinates
+   * @param {number} x - Canvas x coordinate
+   * @param {number} y - Canvas y coordinate
+   * @returns {object} - World coordinates {x, y}
+   */
   mapCoordinates(x, y) {
     const rect = this.canvas.getBoundingClientRect();
     const scaleX = this.canvas.width / rect.width;
     const scaleY = this.canvas.height / rect.height;
-    const cx = (x - rect.left) * scaleX;
-    const cy = (y - rect.top) * scaleY;
+    const cx = (x - rect.left) * scaleX - this._xOffset;
+    const cy = (y - rect.top) * scaleY - this._yOffset;
     return {
-      x: Math.floor(cx / this._cw),
-      y: this.world.rows - Math.ceil(cy / this._ch),
+      x: Math.floor(cx / this._tileSize),
+      y: this.world.rows - Math.ceil(cy / this._tileSize),
     };
   }
 }
