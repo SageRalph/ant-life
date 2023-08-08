@@ -187,7 +187,7 @@ class Worldgen {
 
   _findSurfaceY(x) {
     for (let y = this.world.rows - 1; y >= 0; y--) {
-      if (!this.world.checkTile(x, y, ["AIR", "WATER"])) return y;
+      if (!this.world.checkTile(x, y, JSON.stringify(["AIR", "WATER"]))) return y;
     }
     return 0;
   }

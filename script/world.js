@@ -85,7 +85,7 @@ class World {
   }
 
   setTile(x, y, tile, mask = false) {
-    if (!this.checkTile(x, y, mask)) {
+    if (!this.checkTile(x, y, JSON.stringify(mask))) {
       return false;
     } else {
       this.tiles[y][x] = tile;
@@ -160,7 +160,7 @@ class World {
   }
 
   swapTiles(x, y, a, b, mask = false) {
-    if (!this.checkTile(a, b, mask)) {
+    if (!this.checkTile(a, b, JSON.stringify(mask))) {
       return false;
     } else {
       const t1 = this.getTile(x, y);
@@ -187,7 +187,7 @@ class World {
       centerX + radius,
       centerY + radius,
       function (x, y) {
-        if (mask.length && !me.checkTile(x, y, mask)) return;
+        if (mask.length && !me.checkTile(x, y, JSON.stringify(mask))) return;
         if (!pointWithinRadius(centerX, centerY, x, y, radius)) return;
         me.setTile(x, y, tile);
       },
@@ -197,7 +197,7 @@ class World {
   fillRectangle(minX, minY, maxX, maxY, tile, mask = []) {
     const me = this;
     this.forEachTile(minX, minY, maxX, maxY, function (x, y) {
-      if (mask.length && !me.checkTile(x, y, mask)) return;
+      if (mask.length && !me.checkTile(x, y, JSON.stringify(mask))) return;
       me.setTile(x, y, tile);
     });
   }
