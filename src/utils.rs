@@ -1,6 +1,6 @@
 use rand::Rng;
 
-struct Utils;
+pub struct Utils;
 
 impl Utils {
     // Checks if a point (a, b) is within a radius `r` of the point (x, y)

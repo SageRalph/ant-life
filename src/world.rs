@@ -1,11 +1,12 @@
 use crate::definitions;
 
 pub struct World {
-    rows: i32,
-    cols: i32,
-    age: i32,
-    ants: i32,
-    tiles: Vec<Vec<definitions::TileSet>>,
+    pub rows: i32,
+    pub cols: i32,
+    pub age: i32,
+    pub ants: i32,
+    pub tiles: Vec<Vec<definitions::TileSet>>,
+    pub surface_y: Option<f64>,
 }
 
 impl World {
@@ -15,11 +16,12 @@ impl World {
             cols: cols,
             age: 0,
             ants: 0,
-            tiles: Vec<Vec<definitions::TileSet>::new()>::new(),
+            tiles: Vec::<Vec<definitions::TileSet>>::new(),
+            surface_y:None,
         }
     }
 
-    fn tick(&mut self) {
+    pub fn tick(&mut self) {
         println!("tick")
     }
 
@@ -31,11 +33,11 @@ impl World {
         println!("getTile")
     }
 
-    fn set_tile(&mut self, row: i32, col: i32, mask: Option<definitions::TileSet>) {
+    pub fn set_tile(&mut self, row: i32, col: i32, mask: Option<definitions::TileSet>) {
         println!("setTile")
     }
 
-    fn check_tile(&self, row: i32, col: i32, mask: definitions::TileSet) {
+    pub fn check_tile(&self, row: i32, col: i32, mask: definitions::TileSet) {
         println!("checkTile")
     }
 
@@ -59,7 +61,7 @@ impl World {
         println!("forEachTile")
     }
 
-    fn fill_circle(&self, centerX: i32, centerY: i32, radius: i32, tile: definitions::TileSet, mask: Option<definitions::TileSet>) {
+    pub fn fill_circle(&self, centerX: i32, centerY: i32, radius: i32, tile: definitions::TileSet, mask: Option<Vec<definitions::TileSet>>) {
         println!("fillCircle")
     }
 
