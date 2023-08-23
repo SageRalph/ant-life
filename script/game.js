@@ -106,7 +106,12 @@ function _setBrushMask() {
 function init() {
   if (DEBUG) console.log("Loading...");
   $("#score").text("");
-  WORLD = new World();
+
+  // WASM entrypoint
+  WORLD = new World(); 
+
+  // here renderer has constant access to world, when world is in wasm
+  // this will have to be replaced with getters and setters
   RENDERER = new Renderer(document.getElementById("map"), WORLD, TILESET);
   RENDERER.draw();
   prompt(`
@@ -126,6 +131,7 @@ function gameLoop(loop = true) {
 
     if (DEBUG) {
       const elapsed = performance.now() - start;
+      // TODO replace WORLD.age with WORLD.get_age()
       console.log(`Tick ${WORLD.age} completed in ${elapsed}ms`);
     }
   }
@@ -133,17 +139,21 @@ function gameLoop(loop = true) {
   doInput(false);
   RENDERER.draw();
 
+  // TODO replace WORLD.ants with WORLD.get_ants()
   if (LAST_ANT_COUNT === 1 && WORLD.ants > 1) {
     prompt(`
       The first workers (red) have begun to hatch from eggs (white) <br/> 
       Grow more fungus (teal) by bringing it plant material (green)
     `);
   }
+
+  // TODO replace WORLD.ants with WORLD.get_ants()
   if (WORLD.ants > 1) {
     $("#score").text(WORLD.ants);
   }
   LAST_ANT_COUNT = WORLD.ants;
 
+  // TODO replace WORLD.age with WORLD.get_age()
   if (WORLD.age === RAIN_FREQ - 500) {
     prompt(`
       The spring rains will start soon, prepare for the flood! <br/>
@@ -182,6 +192,8 @@ function doInput(draw = true) {
   if (!BRUSH_ON) return;
   const brushSize = Math.round($("#brush-size").val());
   const brushMat = $("#brush-mat").val();
+  
+  // TODO ensure this is serialised 
   WORLD.fillCircle(BRUSH_X, BRUSH_Y, brushSize, brushMat, BRUSH_MASK);
   if (draw) RENDERER.draw();
 }

@@ -1,12 +1,15 @@
+extern crate wasm_bindgen;
 use wasm_bindgen::prelude::*;
 
-#[wasm_bindgen]
-extern "C" {
-    fn alert(s: &str);
-}
+// Importing modules
+mod definitions;
+mod utils;
+mod worldgen;
+mod worldlogic;
+mod world;
 
-#[wasm_bindgen]
-pub fn greet(name: &str) -> String {
-    alert(&format!("Hello, {}!", name));
-    format!("This string has come from Rust!")
+pub use world::World;
+
+fn main(rows: i32, cols: i32) {
+    let world = world::World::new(rows, cols);
 }
