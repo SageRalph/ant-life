@@ -1,4 +1,4 @@
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub enum TileSet {
     AIR,
     SOIL,
@@ -35,45 +35,46 @@ impl TileSet {
     }
 }
 
-struct Definitions {
-    debug: bool,
-    benchmark_ticks: i32,
-    benchmark_batches: i32,
-    benchmark_density: f64,
-    tps: i32,
-    start_paused: bool,
-    row_count: i32,
-    col_count: i32,
-    chunk_size: i32,
-    rain_freq: i32,
-    rain_time: i32,
-    pest_freq: i32,
-    pest_start: i32,
-    kill_prob: f64,
-    evaporate_prob: f64,
-    convert_prob: f64,
-    grow_prob: f64,
-    egg_lay_prob: f64,
-    egg_hatch_prob: f64,
-    egg_queen_prob: f64,
-    queen_speed: f64,
-    queen_range: i32,
-    queen_fungus_min: i32,
-    pest_seek_prob: f64,
-    pest_range: i32,
-    worker_range: i32,
-    paintable_mask: [TileSet; 3],
-    climb_mask: [TileSet; 7],
-    walk_mask: [TileSet; 6],
-    roam_mask: [TileSet; 4],
-    plant_grow_mask: [TileSet; 4],
-    pest_target_mask: [TileSet; 3],
-    water_kill_mask: [TileSet; 4],
-    push_mask: [TileSet; 2],
+#[derive(Clone)]
+pub struct Definitions {
+    pub debug: bool,
+    pub benchmark_ticks: i32,
+    pub benchmark_batches: i32,
+    pub benchmark_density: f64,
+    pub tps: i32,
+    pub start_paused: bool,
+    pub row_count: i32,
+    pub col_count: i32,
+    pub chunk_size: i32,
+    pub rain_freq: i32,
+    pub rain_time: i32,
+    pub pest_freq: i32,
+    pub pest_start: i32,
+    pub kill_prob: f64,
+    pub evaporate_prob: f64,
+    pub convert_prob: f64,
+    pub grow_prob: f64,
+    pub egg_lay_prob: f64,
+    pub egg_hatch_prob: f64,
+    pub egg_queen_prob: f64,
+    pub queen_speed: f64,
+    pub queen_range: i32,
+    pub queen_fungus_min: i32,
+    pub pest_seek_prob: f64,
+    pub pest_range: i32,
+    pub worker_range: i32,
+    pub paintable_mask: [TileSet; 3],
+    pub climb_mask: [TileSet; 7],
+    pub walk_mask: [TileSet; 6],
+    pub roam_mask: [TileSet; 4],
+    pub plant_grow_mask: [TileSet; 4],
+    pub pest_target_mask: [TileSet; 3],
+    pub water_kill_mask: [TileSet; 4],
+    pub push_mask: [TileSet; 2],
 }
 
 impl Definitions {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Definitions {
             debug: true,
             benchmark_ticks: 100,

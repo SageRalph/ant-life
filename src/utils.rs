@@ -10,9 +10,9 @@ impl Utils {
     }
 
     // Generates a random integer within a range [min, max] inclusive
-    pub fn random_int_inclusive(min: i32, max: i32) -> i32 {
+    pub fn random_int_inclusive(min: &i32, max: &i32) -> i32 {
         let mut rng = rand::thread_rng();
-        rng.gen_range(min..=max)
+        rng.gen_range(*min..=*max)
     }
 
     // Returns 1 or -1 randomly
