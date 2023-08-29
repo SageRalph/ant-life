@@ -1,5 +1,6 @@
 use std::cell::RefCell;
 use std::rc::Rc;
+use std::cmp;
 
 use crate::utils::Utils;
 use crate::definitions;
@@ -40,7 +41,10 @@ impl World {
         self.update_chunks();
         // self.worldlogic.tick(); // TODO implement this
 
-        if self.age >= self.defs.rain_freq && self.age % self.defs.rain_freq <= self.defs.rain_time {
+        if 
+            self.age >= self.defs.rain_freq && 
+            self.age % self.defs.rain_freq <= self.defs.rain_time 
+        {
             let max_rain = Utils::random_int_inclusive(&1, &5);
             let rain_progress = self.age % self.defs.rain_freq;
 
@@ -51,28 +55,56 @@ impl World {
                 / 100.0;
 
 
-            self.do_rain(rain_count, &None);
+            self.do_rain(rain_count, None);
         } 
         // Pests (never at the same time as rain)
         else if self.age >= self.defs.pest_start && self.age % self.defs.pest_freq == 0 {
             let random_value = rand::random::<f64>();
-            self.do_rain(random_value, &Some(definitions::TileSet::PEST));       // Assuming do_rain accepts f64 and &str
+            self.do_rain(random_value, Some(&definitions::TileSet::PEST));       // Assuming do_rain accepts f64 and &str
         }
     }
 
-    fn do_rain(&mut self, _count: f64, _tile: &Option<definitions::TileSet>) {
-        println!("doRain")
+    fn do_rain(&mut self, count: f64, def_tile: Option<&definitions::TileSet>) {
+        let tile = match def_tile {
+            Some(tile) => tile.clone(),
+            None => definitions::TileSet::WATER,
+        };
+
+        let mut real_count = count.floor() as usize;
+        if rand::random::<f64>() <= count % 1.0 {
+            real_count += 1;
+        }
+        for _ in 0..real_count {
+            let x = Utils::random_int_inclusive(&0, &self.cols);
+            self.set_tile(
+                &x, 
+                &(self.rows - 1), 
+                &tile, 
+                Some(&vec![definitions::TileSet::AIR])
+            );
+        }
     }
 
-    fn get_tile(&self, x: i32, y: i32) -> definitions::TileSet {
-        self.tiles[x as usize][y as usize]
+    fn get_tile(&self, x: &i32, y: &i32) -> definitions::TileSet {
+        self.tiles[*x as usize][*y as usize]
     }
 
-    pub fn set_tile(&mut self, _row: i32, _col: i32, _mask: Option<definitions::TileSet>) {
-        println!("setTile")
+    pub fn set_tile(
+        &mut self, 
+        x: &i32, 
+        y: &i32, 
+        tile: &definitions::TileSet, 
+        mask: Option<&Vec<definitions::TileSet>>,
+    ) -> bool {
+        if !self.check_tile(x, y, mask) {
+            false
+        } else {
+            self.tiles[*y as usize][*x as usize] = *tile;
+            true
+        }
     }
 
-    pub fn check_tile(&self, x: i32, y: i32, mask: Option<&Vec<definitions::TileSet>>) -> bool {
+    pub fn check_tile(&self, x: &i32, y: &i32, mask: Option<&Vec<definitions::TileSet>>) -> bool {
         if !self.legal(x, y) {
             return false;
         }
@@ -83,12 +115,69 @@ impl World {
         }
     }
 
-    fn check_chunks(&self, _row: i32, _col: i32, _mask: definitions::TileSet, _distance: i32, _threshold: i32) {
-        println!("checkChunks")
+    fn check_chunks(
+        &self, 
+        y: &i32, 
+        x: &i32, 
+        mask: &Vec<definitions::TileSet>, 
+        def_distance: Option<&i32>, 
+        def_threshold: Option<&i32>,
+    ) -> bool {
+        if !self.legal(x, y) {
+            return false;
+        }
+
+        let distance = match def_distance {
+            Some(distance) => def_distance.unwrap(),
+            None => &0
+        };
+
+        let threshold = match def_threshold {
+            Some(threshold) => def_threshold.unwrap(),
+            None => &1
+        };
+
+        // original JS if !mask, is mask sometimes undefined? It never
+        // appears to be. Assuming mask is always defined for now.
+        if threshold == &0 {
+            return true;
+        }
+
+        let chunks = self.get_chunks(x, y, distance);
+        let mut total = 0;
+
+        for chunk in &chunks {
+            if let mask = mask {
+                for tile in mask {
+                    total += *chunk.get(tile).unwrap_or(&0);
+                    if total > threshold {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        false
     }
 
-    fn get_chunks(&self, _row: i32, _col: i32, _distance: i32) {
-        println!("getChunks")
+    fn get_chunks(&self, y: &i32, x: &i32, distance: &i32) {
+        println!("getChunks");
+        let cx_min = cmp::max(
+            0,
+            (((x - distance) / self.defs.chunk_size) as f64).floor() as i32
+        );
+        let cy_min = cmp::max(
+            0, 
+            (((y - distance) / self.defs.chunk_size) as f64).floor() as i32
+        );
+        let cx_max = cmp::min (
+            self.chunks[0].len() - 1,
+            (((x + distance) / self.defs.chunk_size) as f64).floor() as i32
+        );
+        let cy_max = cmp::min(
+            self.chunks.len() - 1,
+            (((y + distance) / self.defs.chunk_size) as f64).floor() as i32
+        );
     }
 
     fn update_chunks(&self) {
@@ -126,8 +215,8 @@ impl World {
         println!("fillRectangle")
     }
 
-    fn legal(&self, x: i32, y: i32) -> bool {
-        x > 0 && y >=0 && x < self.cols && y < self.rows
+    fn legal(&self, x: &i32, y: &i32) -> bool {
+        x > &0 && y >= &0 && x < &self.cols && y < &self.rows
     }
 
     fn benchmark(&self) {
