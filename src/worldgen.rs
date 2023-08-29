@@ -156,7 +156,12 @@ impl Worldgen {
         for x in 0..self.world.borrow_mut().cols {
             if rand::random::<f64>() <= plant_prob {
                 let y = self.find_surface_y(x) + 1;
-                self.world.borrow_mut().set_tile(x, y, Some(definitions::TileSet::PLANT));
+                self.world.borrow_mut().set_tile(
+                    &x, 
+                    &y, 
+                    &definitions::TileSet::PLANT, 
+                    None
+                );
             }
         }
 
@@ -217,7 +222,12 @@ impl Worldgen {
         }
 
         // Starting units
-        self.world.borrow_mut().set_tile(mid_x, surface_y as i32, Some(definitions::TileSet::QUEEN));
+        self.world.borrow_mut().set_tile(
+            &mid_x, 
+            &(surface_y as i32), 
+            &definitions::TileSet::QUEEN,
+            None,
+        );
 
     }
 
@@ -243,7 +253,7 @@ impl Worldgen {
 
     pub fn find_surface_y(&self, x: i32) -> i32 {
         for y in (0..=self.world.borrow().rows).rev() {
-            if self.world.borrow().check_tile(x, y, Some(&vec![definitions::TileSet::AIR, definitions::TileSet::WATER])) {
+            if self.world.borrow().check_tile(&x, &y, Some(&vec![definitions::TileSet::AIR, definitions::TileSet::WATER])) {
                 return y;
             }
         }
