@@ -18,7 +18,12 @@ impl Worldlogic {
     }
 
     pub fn _sandAction(x:i32,y:i32){
-        
+        const bias = utils::random_sign();
+        return (
+            self.world.swap_tiles(x, y, x, y - 1, ["AIR", "WATER"]) ||
+            self.world.swap_tiles(x, y, x + bias, y - 1, ["AIR", "WATER"]) ||
+            self.world.swap_tiles(x, y, x - bias, y - 1, ["AIR", "WATER"]);
+        )
     }
 
 }
