@@ -16,6 +16,7 @@ pub struct World {
     pub surface_y: Option<i32>,
     pub worldgen: Option<worldgen::Worldgen>,
     pub defs: definitions::Definitions,
+    // pub chunks: // what type is a chunk??
 }
 
 impl World {
@@ -182,14 +183,25 @@ impl World {
 
     fn update_chunks(&self) {
         println!("updateChunks")
+        // dependent functions
+        // 1) for each tile
     }
 
     fn swap_tiles(&self, _row1: i32, _col1: i32, _row2: i32, _col2: i32, _mask: Option<definitions::TileSet>) {
         println!("swapTiles")
     }
 
-    fn for_each_tile(&self, _min_row: i32, _min_col: i32, _max_row: i32, _max_col: i32, _callback: fn(i32, i32))  {
+    fn for_each_tile(
+        &self, 
+        min_x: i32, 
+        min_col: i32, 
+        max_row: i32, 
+        max_col: i32, 
+        callback: fn(i32, i32),
+    )  {
         println!("forEachTile")
+        // dependent functions
+        // none
     }
 
     pub fn fill_circle(
