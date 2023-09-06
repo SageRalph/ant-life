@@ -17,13 +17,17 @@ impl Worldlogic {
         }
     }
 
-    pub fn _sandAction(x:i32,y:i32){
-        const bias = utils::random_sign();
-        return (
-            self.world.swap_tiles(x, y, x, y - 1, ["AIR", "WATER"]) ||
-            self.world.swap_tiles(x, y, x + bias, y - 1, ["AIR", "WATER"]) ||
-            self.world.swap_tiles(x, y, x - bias, y - 1, ["AIR", "WATER"]);
-        )
+    pub fn _sand_action(&self, x: i32,y: i32) -> bool{
+        // move down or diagonally down
+        let bias: i32 = Utils::random_sign();
+
+        return 
+            self.world.swap_tiles(x, y, x, y - 1, vec![definitions::TileSet::AIR,
+                definitions::TileSet:: WATER]) ||
+            self.world.swap_tiles(x, y, x + bias, y - 1, vec![definitions::TileSet::AIR, 
+                definitions::TileSet::WATER]) ||
+            self.world.swap_tiles(x, y, x - bias, y - 1, vec![definitions::TileSet::AIR,
+                definitions::TileSet::WATER]);
     }
 
 }
