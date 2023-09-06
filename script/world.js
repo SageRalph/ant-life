@@ -186,6 +186,7 @@ class World {
         );
       }
     }
+    console.log(this.chunks);
   }
 
   /**
