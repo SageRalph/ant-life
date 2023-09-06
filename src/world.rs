@@ -184,8 +184,16 @@ impl World {
         println!("updateChunks")
     }
 
-    fn swap_tiles(&self, _row1: i32, _col1: i32, _row2: i32, _col2: i32, _mask: Option<definitions::TileSet>) {
-        println!("swapTiles")
+    pub fn swap_tiles(&mut self, x: &i32, y: &i32, a: &i32, b: &i32, mask: Option<&Vec<definitions::TileSet>>) -> bool {
+        if !self.check_tile(a, b, mask) {
+            false
+        } else {
+            let t1 = self.get_tile(x, y);
+            let t2 = self.get_tile(a, b);
+            self.set_tile(a, b, &t1, None);
+            self.set_tile(x, y, &t2, None);
+            true
+        }
     }
 
     fn for_each_tile(&self, _min_row: i32, _min_col: i32, _max_row: i32, _max_col: i32, _callback: fn(i32, i32))  {
