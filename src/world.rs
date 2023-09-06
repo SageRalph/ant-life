@@ -120,43 +120,36 @@ impl World {
     }
 
     fn check_chunks(
-        &self, 
-        y: &i32, 
-        x: &i32, 
-        mask: &Vec<definitions::TileSet>, 
-        def_distance: Option<&i32>, 
-        def_threshold: Option<&i32>,
+        &self,
+        y: &i32,
+        x: &i32,
+        mask: Option<&Vec<definitions::TileSet>>,
+        def_distance: Option<i32>,
+        def_threshold: Option<i32>,
     ) -> bool {
         if !self.legal(x, y) {
             return false;
         }
 
-        let distance = match def_distance {
-            Some(distance) => def_distance.unwrap(),
-            None => &0
-        };
+        let distance = def_distance.unwrap_or(0);
+        let threshold = def_threshold.unwrap_or(1);
 
-        let threshold = match def_threshold {
-            Some(threshold) => def_threshold.unwrap(),
-            None => &1
-        };
-
-        // original JS if !mask, is mask sometimes undefined? It never
-        // appears to be. Assuming mask is always defined for now.
-        if threshold == &0 {
+        if threshold == 0 {
             return true;
         }
 
-        let chunks = self.get_chunks(x, y, distance);
+        if mask.is_none() {
+            return true;
+        }
+
+        let chunks = self.get_chunks(x, y, &distance);
         let mut total = 0;
 
         for chunk in &chunks {
-            if let mask = mask {
-                for tile in mask {
-                    total += *chunk.get(tile).unwrap_or(&0);
-                    if total > threshold {
-                        return true;
-                    }
+            for tile in mask.unwrap() {
+                total += chunk.get(tile);
+                if total > threshold {
+                    return true;
                 }
             }
         }
@@ -164,7 +157,7 @@ impl World {
         false
     }
 
-    fn get_chunks(&self, y: &i32, x: &i32, distance: &i32) {
+    fn get_chunks(&self, y: &i32, x: &i32, distance: &i32) -> Vec<&Chunk> {
         println!("getChunks");
         let cx_min = cmp::max(
             0,
@@ -174,14 +167,22 @@ impl World {
             0, 
             (((y - distance) / self.defs.chunk_size) as f64).floor() as i32
         );
-        let cx_max = cmp::min (
-            self.chunks[0].len() - 1,
-            (((x + distance) / self.defs.chunk_size) as f64).floor() as usize 
+        let cx_max: i32 = cmp::min (
+            (self.chunks[0].len() - 1) as i32,
+            (((x + distance) / self.defs.chunk_size) as f64).floor() as i32
         );
-        let cy_max = cmp::min(
-            self.chunks.len() - 1,
-            (((y + distance) / self.defs.chunk_size) as f64).floor() as usize
+        let cy_max: i32 = cmp::min(
+            (self.chunks.len() - 1) as i32,
+            (((y + distance) / self.defs.chunk_size) as f64).floor() as i32
         );
+
+        let mut matches = Vec::new();
+        for cx in cx_min..=cx_max {
+            for cy in cy_min..=cy_max {
+                matches.push(&self.chunks[cy as usize][cx as usize]);
+            }
+        }
+        matches
     }
 
     pub fn update_chunks(&mut self) {

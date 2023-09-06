@@ -52,6 +52,26 @@ pub struct Chunk {
     pub trail: i32,
 }
 
+impl Chunk {
+    pub fn get(&self, tile: &TileSet) -> i32 {
+        match tile {
+            TileSet::AIR => self.air,
+            TileSet::SOIL => self.soil,
+            TileSet::SAND => self.sand,
+            TileSet::STONE => self.stone,
+            TileSet::WORKER => self.worker,
+            TileSet::QUEEN => self.queen,
+            TileSet::EGG => self.egg,
+            TileSet::CORPSE => self.corpse,
+            TileSet::PLANT => self.plant,
+            TileSet::WATER => self.water,
+            TileSet::FUNGUS => self.fungus,
+            TileSet::PEST => self.pest,
+            TileSet::TRAIL => self.trail,
+        }
+    }
+}
+
 #[derive(Clone)]
 pub struct Definitions {
     pub debug: bool,
