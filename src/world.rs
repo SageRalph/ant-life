@@ -2,6 +2,8 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use std::cmp;
 
+use crate::definitions::Chunk;
+use crate::definitions::TileSet;
 use crate::utils::Utils;
 use crate::definitions;
 use crate::worldgen;
@@ -16,7 +18,7 @@ pub struct World {
     pub surface_y: Option<i32>,
     pub worldgen: Option<worldgen::Worldgen>,
     pub defs: definitions::Definitions,
-    // pub chunks: // what type is a chunk??
+    pub chunks: Vec<Vec<definitions::Chunk>>,
 }
 
 impl World {
@@ -30,6 +32,7 @@ impl World {
             surface_y: None,
             worldgen: None,
             defs: definitions::Definitions::new(),
+            chunks: Vec::<Vec<definitions::Chunk>>::new(),
         }
     }
 
@@ -117,43 +120,36 @@ impl World {
     }
 
     fn check_chunks(
-        &self, 
-        y: &i32, 
-        x: &i32, 
-        mask: &Vec<definitions::TileSet>, 
-        def_distance: Option<&i32>, 
-        def_threshold: Option<&i32>,
+        &self,
+        y: &i32,
+        x: &i32,
+        mask: Option<&Vec<definitions::TileSet>>,
+        def_distance: Option<i32>,
+        def_threshold: Option<i32>,
     ) -> bool {
         if !self.legal(x, y) {
             return false;
         }
 
-        let distance = match def_distance {
-            Some(distance) => def_distance.unwrap(),
-            None => &0
-        };
+        let distance = def_distance.unwrap_or(0);
+        let threshold = def_threshold.unwrap_or(1);
 
-        let threshold = match def_threshold {
-            Some(threshold) => def_threshold.unwrap(),
-            None => &1
-        };
-
-        // original JS if !mask, is mask sometimes undefined? It never
-        // appears to be. Assuming mask is always defined for now.
-        if threshold == &0 {
+        if threshold == 0 {
             return true;
         }
 
-        let chunks = self.get_chunks(x, y, distance);
+        if mask.is_none() {
+            return true;
+        }
+
+        let chunks = self.get_chunks(x, y, &distance);
         let mut total = 0;
 
         for chunk in &chunks {
-            if let mask = mask {
-                for tile in mask {
-                    total += *chunk.get(tile).unwrap_or(&0);
-                    if total > threshold {
-                        return true;
-                    }
+            for tile in mask.unwrap() {
+                total += chunk.get(tile);
+                if total > threshold {
+                    return true;
                 }
             }
         }
@@ -161,7 +157,7 @@ impl World {
         false
     }
 
-    fn get_chunks(&self, y: &i32, x: &i32, distance: &i32) {
+    fn get_chunks(&self, y: &i32, x: &i32, distance: &i32) -> Vec<&Chunk> {
         println!("getChunks");
         let cx_min = cmp::max(
             0,
@@ -171,20 +167,75 @@ impl World {
             0, 
             (((y - distance) / self.defs.chunk_size) as f64).floor() as i32
         );
-        let cx_max = cmp::min (
-            self.chunks[0].len() - 1,
+        let cx_max: i32 = cmp::min (
+            (self.chunks[0].len() - 1) as i32,
             (((x + distance) / self.defs.chunk_size) as f64).floor() as i32
         );
-        let cy_max = cmp::min(
-            self.chunks.len() - 1,
+        let cy_max: i32 = cmp::min(
+            (self.chunks.len() - 1) as i32,
             (((y + distance) / self.defs.chunk_size) as f64).floor() as i32
         );
+
+        let mut matches = Vec::new();
+        for cx in cx_min..=cx_max {
+            for cy in cy_min..=cy_max {
+                matches.push(&self.chunks[cy as usize][cx as usize]);
+            }
+        }
+        matches
     }
 
-    fn update_chunks(&self) {
-        println!("updateChunks")
-        // dependent functions
-        // 1) for each tile
+    pub fn update_chunks(&mut self) {
+        self.chunks.clear();
+
+        let chunk_count = (self.rows as f32 / self.defs.chunk_size as f32).ceil() as i32;
+        for b in 0..chunk_count {
+            let mut row_chunks = Vec::new();
+            for a in 0..chunk_count {
+                let mut blank_chunk = Chunk {
+                    air: 0,
+                    soil: 0,
+                    sand: 0,
+                    stone: 0,
+                    worker: 0,
+                    queen: 0,
+                    egg: 0,
+                    corpse: 0,
+                    plant: 0,
+                    water: 0,
+                    fungus: 0,
+                    pest: 0,
+                    trail: 0,
+                };
+
+                let b0 = b * self.defs.chunk_size;
+                let a0 = a * self.defs.chunk_size;
+                self.for_each_tile(
+                    a0, b0, 
+                    a0 + self.defs.chunk_size, b0 + self.defs.chunk_size, 
+                    |x, y| {
+                        match self.get_tile(&x, &y) {
+                            TileSet::AIR => blank_chunk.air += 1,
+                            TileSet::SOIL => blank_chunk.soil += 1,
+                            TileSet::SAND => blank_chunk.sand += 1,
+                            TileSet::STONE => blank_chunk.stone += 1,
+                            TileSet::WORKER => blank_chunk.worker += 1,
+                            TileSet::QUEEN => blank_chunk.queen += 1,
+                            TileSet::EGG => blank_chunk.egg += 1,
+                            TileSet::CORPSE => blank_chunk.corpse += 1,
+                            TileSet::PLANT => blank_chunk.plant += 1,
+                            TileSet::WATER => blank_chunk.water += 1,
+                            TileSet::FUNGUS => blank_chunk.fungus += 1,
+                            TileSet::PEST => blank_chunk.pest += 1,
+                            TileSet::TRAIL => blank_chunk.trail += 1,
+                        }
+                    }
+                );
+
+                row_chunks.push(blank_chunk);
+            }
+            self.chunks.push(row_chunks);
+        }
     }
 
     pub fn swap_tiles(&mut self, x: &i32, y: &i32, a: &i32, b: &i32, mask: Option<&Vec<definitions::TileSet>>) -> bool {
@@ -199,17 +250,25 @@ impl World {
         }
     }
 
-    fn for_each_tile(
+    fn for_each_tile<F>(
         &self, 
         min_x: i32, 
         min_col: i32, 
         max_row: i32, 
         max_col: i32, 
-        callback: fn(i32, i32),
-    )  {
-        println!("forEachTile")
-        // dependent functions
-        // none
+        mut callback: F,
+    ) where F: FnMut(i32, i32) {
+        let max_y = (max_row).min(self.rows - 1);
+        let min_y = min_col.max(0);
+        
+        let max_x = (max_col).min(self.cols - 1);
+        let min_x = min_x.max(0);
+        
+        for y in min_y..=max_y {
+            for x in min_x..=max_x {
+                callback(x, y);
+            }
+        }
     }
 
     pub fn fill_circle(

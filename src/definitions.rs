@@ -36,6 +36,43 @@ impl TileSet {
 }
 
 #[derive(Clone)]
+pub struct Chunk {
+    pub air: i32,
+    pub soil: i32,
+    pub sand: i32,
+    pub stone: i32,
+    pub worker: i32,
+    pub queen: i32,
+    pub egg: i32,
+    pub corpse: i32,
+    pub plant: i32,
+    pub water: i32,
+    pub fungus: i32,
+    pub pest: i32,
+    pub trail: i32,
+}
+
+impl Chunk {
+    pub fn get(&self, tile: &TileSet) -> i32 {
+        match tile {
+            TileSet::AIR => self.air,
+            TileSet::SOIL => self.soil,
+            TileSet::SAND => self.sand,
+            TileSet::STONE => self.stone,
+            TileSet::WORKER => self.worker,
+            TileSet::QUEEN => self.queen,
+            TileSet::EGG => self.egg,
+            TileSet::CORPSE => self.corpse,
+            TileSet::PLANT => self.plant,
+            TileSet::WATER => self.water,
+            TileSet::FUNGUS => self.fungus,
+            TileSet::PEST => self.pest,
+            TileSet::TRAIL => self.trail,
+        }
+    }
+}
+
+#[derive(Clone)]
 pub struct Definitions {
     pub debug: bool,
     pub benchmark_ticks: i32,
