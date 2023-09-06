@@ -17,7 +17,7 @@ impl Worldlogic {
         }
     }
 
-    pub fn _sand_action(&self, x: i32,y: i32) -> bool{
+    pub fn _sand_action(&self, x: i32, y: i32) -> bool{
         // move down or diagonally down
         let bias: i32 = Utils::random_sign();
 
