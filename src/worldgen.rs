@@ -259,5 +259,4 @@ impl Worldgen {
         }
         0
     }
-
 }

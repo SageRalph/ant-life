@@ -238,15 +238,24 @@ impl World {
         }
     }
 
-    pub fn swap_tiles(&mut self, x: &i32, y: &i32, a: &i32, b: &i32, mask: Option<&Vec<definitions::TileSet>>) -> bool {
-        if !self.check_tile(a, b, mask) {
-            false
-        } else {
-            let t1 = self.get_tile(x, y);
-            let t2 = self.get_tile(a, b);
-            self.set_tile(a, b, &t1, None);
-            self.set_tile(x, y, &t2, None);
+    fn swap_tiles(
+        &mut self, 
+        x: &i32, 
+        y: &i32, 
+        a: &i32, 
+        b: &i32, 
+        mask: Option<&Vec<definitions::TileSet>>
+    ) -> bool {
+        if self.check_tile(&a, &b, mask) {
+            let t1 = self.get_tile(&x, &y).clone();
+            let t2 = self.get_tile(&a, &b).clone();
+            
+            self.set_tile(&a, &b, &t1, None);
+            self.set_tile(&x, &y, &t2, None);
+
             true
+        } else {
+            false
         }
     }
 
@@ -295,7 +304,7 @@ impl World {
     }
 
     fn legal(&self, x: &i32, y: &i32) -> bool {
-        x > &0 && y >= &0 && x < &self.cols && y < &self.rows
+        *x > 0 && *y >= 0 && *x < self.cols && *y < self.rows
     }
 
     fn benchmark(&self) {
