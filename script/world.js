@@ -60,12 +60,6 @@ class World {
     }
   }
 
-  checkTile(x, y, mask) {
-    if (!this._legal(x, y)) return false;
-    if (!mask) return true;
-    return mask.includes(this.getTile(x, y));
-  }
-
   checkChunks(x, y, mask, distance = 0, threshold = 1) {
     if (!this._legal(x, y)) return false;
     if (!mask) return true;
@@ -130,6 +124,7 @@ class World {
         );
       }
     }
+    console.log(this.chunks);
   }
 
   swapTiles(x, y, a, b, mask = false) {
@@ -142,6 +137,12 @@ class World {
       this.setTile(x, y, t2);
       return true;
     }
+  }
+
+  checkTile(x, y, mask) {
+    if (!this._legal(x, y)) return false;
+    if (!mask) return true;
+    return mask.includes(this.getTile(x, y));
   }
 
   forEachTile(minX, minY, maxX, maxY, func) {
