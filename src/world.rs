@@ -108,17 +108,6 @@ impl World {
         }
     }
 
-    pub fn check_tile(&self, x: &i32, y: &i32, mask: Option<&Vec<definitions::TileSet>>) -> bool {
-        if !self.legal(x, y) {
-            return false;
-        }
-
-        match mask {
-            Some(mask_vec) => mask_vec.contains(&self.get_tile(x, y)),
-            None => true,
-        }
-    }
-
     fn check_chunks(
         &self,
         y: &i32,
@@ -184,7 +173,7 @@ impl World {
         }
         matches
     }
-
+    
     pub fn update_chunks(&mut self) {
         self.chunks.clear();
 
@@ -237,6 +226,19 @@ impl World {
             self.chunks.push(row_chunks);
         }
     }
+
+    pub fn check_tile(&self, x: &i32, y: &i32, mask: Option<&Vec<definitions::TileSet>>) -> bool {
+        if !self.legal(x, y) {
+            return false;
+        }
+
+        match mask {
+            Some(mask_vec) => mask_vec.contains(&self.get_tile(x, y)),
+            None => true,
+        }
+    }
+
+
 
     pub fn swap_tiles(&mut self, x: &i32, y: &i32, a: &i32, b: &i32, mask: Option<&Vec<definitions::TileSet>>) -> bool {
         if !self.check_tile(a, b, mask) {
