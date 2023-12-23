@@ -2,8 +2,6 @@
 
 A game with bugs
 
-https://SageRalph.github.io/ant-life/
-
 Ant Life is a web game inspired by [Powder Game](https://dan-ball.jp/en/javagame/dust/)
 and [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway's_Game_of_Life),
 but instead simulates the behaviour of ants and their environment.
